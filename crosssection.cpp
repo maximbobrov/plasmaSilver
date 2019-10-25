@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <stdio.h>
 #include <vector>
+
 crossSection::crossSection()
 {
     m_sigmas = nullptr;
@@ -98,6 +99,26 @@ void crossSection::fillSigmas(double *sNew, double *eNew, int n)
     {
         m_sigmas[i]=sNew[i];
         m_energs[i]=eNew[i];
+    }
+    fillK();
+}
+
+void crossSection::fillSigmas2(double esNew[][2], int n)
+{
+    m_sigNum=n;
+    if (m_sigmas!=NULL)
+    {
+        delete[] m_sigmas;
+        delete[] m_energs;
+    }
+
+    m_sigmas = new double[m_sigNum];
+    m_energs = new double[m_sigNum];
+
+    for (int i=0;i<m_sigNum;i++)
+    {
+        m_sigmas[i]=esNew[i][0];
+        m_energs[i]=esNew[i][1];
     }
     fillK();
 }

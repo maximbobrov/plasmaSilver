@@ -31,7 +31,8 @@ SOURCES += \
         qcustomplot.cpp \
         simulationdata.cpp \
         simulationsolver.cpp \
-        simulationtools.cpp
+        simulationtools.cpp \
+        reaction.cpp
 
 HEADERS += \
         crosssection.h \
@@ -39,9 +40,16 @@ HEADERS += \
         qcustomplot.h \
         simulationdata.h \
         simulationsolver.h \
-        simulationtools.h
+        simulationtools.h \
+        reaction.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    reactions/e+Ar_2e+Ar+.txt \
+    reactions/e+Ar_e+Ar.txt \
+    reactions/e+Ar_e+Ars.txt \
+    reactions/e+Ars_2e+Ar+.txt

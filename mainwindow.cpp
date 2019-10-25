@@ -41,12 +41,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     m_data = new simulationData(NZ);
+    m_data->setDt();
+    m_data->setDz();
     m_sNe = new solverNe(m_data);
     m_sEn = new solverEnergy(m_data);
     m_sPhi = new solverPhi(m_data);
 
-    m_data->setDt();
-    m_data->setDz();
     m_textStartTime->setText(QString().number(0.0));
     m_textDeltaTime->setText(QString().number(m_data->getDt()));
     m_textEndTime->setText(QString().number(0.0001));
