@@ -1,5 +1,7 @@
 #include "reaction.h"
+#include "simulationdata.h"
 
+#include <QDebug>
 
 static const int g_EAr_EAr_num =67;
 
@@ -31,7 +33,7 @@ static double g_EArs_2EArp[g_EArs_2EArp_num][2] = {
 
 reaction::reaction(simulationData* data)
 {
-
+    m_pData=data;
     if (data != nullptr)
     {
         int cn=data->getCellsNumber();
@@ -45,10 +47,15 @@ reaction::reaction(simulationData* data)
 
 void reaction::calc()
 {
-//just a placeholder here
+    //just a placeholder here
 }
 
-reactionEAr_EAr::reactionEAr_EAr(simulationData *data)
+double *reaction::getR()
+{
+    return m_R;
+}
+
+reactionEAr_EAr::reactionEAr_EAr(simulationData *data):reaction(data)
 {
     if (data != nullptr)
     {
@@ -59,38 +66,65 @@ reactionEAr_EAr::reactionEAr_EAr(simulationData *data)
 
 void reactionEAr_EAr::calc()
 {
+    double* En=m_pData->getFieldEnergy()->arr;
+    double* Ne=m_pData->getFieldNe()->arr;
+    double* Ar=m_pData->getFieldHeavySpicies(simulationData::SpecieName::Ar)->arr;
 
+    double N=m_pData->getN();
+
+    for (int i=0;i<m_pData->getCellsNumber();i++)
+    {
+        m_R[i]=0.0;//m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
+    }
 }
 
-reactionEAr_EArs::reactionEAr_EArs(simulationData *data)
+reactionEAr_EArs::reactionEAr_EArs(simulationData *data):reaction(data)
 {
     if (data != nullptr)
     {
-       m_cs=new crossSection(30,g_EAr_EArs_num,30);
+        m_cs=new crossSection(30,g_EAr_EArs_num,30);
         m_cs->fillSigmas2(g_EAr_EArs,g_EAr_EArs_num);
     }
 }
 
 void reactionEAr_EArs::calc()
 {
+    double* En=m_pData->getFieldEnergy()->arr;
+    double* Ne=m_pData->getFieldNe()->arr;
+    double* Ar=m_pData->getFieldHeavySpicies(simulationData::SpecieName::Ar)->arr;
 
+    double N=m_pData->getN();
+
+    for (int i=0;i<m_pData->getCellsNumber();i++)
+    {
+        m_R[i]=0.0;//m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
+    }
 }
 
-reactionEAr_2EArp::reactionEAr_2EArp(simulationData *data)
+reactionEAr_2EArp::reactionEAr_2EArp(simulationData *data):reaction(data)
 {
     if (data != nullptr)
     {
         m_cs=new crossSection(30,g_EAr_2EArp_num,30);
-       m_cs->fillSigmas2(g_EAr_2EArp,g_EAr_2EArp_num);
+        m_cs->fillSigmas2(g_EAr_2EArp,g_EAr_2EArp_num);
     }
 }
 
 void reactionEAr_2EArp::calc()
 {
+      //<<m_pData->getFieldEnergy()->name;
+    double* En=m_pData->getFieldEnergy()->arr;
+    double* Ne=m_pData->getFieldNe()->arr;
+    double* Ar=m_pData->getFieldHeavySpicies(simulationData::SpecieName::Ar)->arr;
 
+    double N=m_pData->getN();
+    for (int i=0;i<m_pData->getCellsNumber();i++)
+    {
+        m_R[i]=0.0;//m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
+    }
 }
 
-reactionEArs_2EArp::reactionEArs_2EArp(simulationData *data)
+reactionEArs_2EArp::reactionEArs_2EArp(simulationData *data):reaction(data)
 {
     if (data != nullptr)
     {
@@ -102,4 +136,15 @@ reactionEArs_2EArp::reactionEArs_2EArp(simulationData *data)
 void reactionEArs_2EArp::calc()
 {
 
+
+    double* En=m_pData->getFieldEnergy()->arr;
+    double* Ne=m_pData->getFieldNe()->arr;
+    double* Ars=m_pData->getFieldHeavySpicies(simulationData::SpecieName::Ar_star)->arr;
+
+    double N=m_pData->getN();
+
+    for (int i=0;i<m_pData->getCellsNumber();i++)
+    {
+        m_R[i]=0.0;//m_cs->getSpline(En[i])*N*Ars[i]*Ne[i]*0.0;
+    }
 }

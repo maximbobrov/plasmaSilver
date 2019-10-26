@@ -1,6 +1,7 @@
 #include "simulationsolver.h"
 #include "simulationtools.h"
 #include "math.h"
+#include <QDebug>
 
 
 simulationSolver::simulationSolver(simulationData* ipData/*= nullptr*/)
@@ -89,10 +90,20 @@ solverNe::solverNe(simulationData* pData)
 double solverNe::getRhs()
 {
     simulationData::simulationParameters* pParams = m_pData->getParameters();
+
+
+    m_pData->calcReaction(simulationData::ReactionName::eAr_2eArp);
+    m_pData->calcReaction(simulationData::ReactionName::eArs_2eArp);
+
+    double* R1_Ar_e=m_pData->getReactionRate(simulationData::ReactionName::eAr_2eArp);
+    double* R2_Ar_e=m_pData->getReactionRate(simulationData::ReactionName::eArs_2eArp);
+
+
     double dz = m_pData->getDz();
     for (int i = 0; i < m_field ->cellsNumber-1; ++i)
     {
-        m_aRHS[i]= + pParams->arrMue[i] * pParams->arrE[i] * simulationTools::ddzCentral(m_field->arr, m_field ->cellsNumber, dz, i)
+        m_aRHS[i]= R1_Ar_e[i] + R2_Ar_e[i]
+                   + pParams->arrMue[i] * pParams->arrE[i] * simulationTools::ddzCentral(m_field->arr, m_field ->cellsNumber, dz, i)
                    + pParams->arrMue[i] * m_field->arr[i] * simulationTools::ddzCentral(pParams->arrE, m_field ->cellsNumber, dz, i)
                    + simulationTools::ddzCentral(m_field->arr, m_field ->cellsNumber, dz, i) * simulationTools::ddzCentral(pParams->arrDe, m_field ->cellsNumber, dz, i);
     }

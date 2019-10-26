@@ -2,7 +2,7 @@
 #define SIMULATIONDATA_H
 #include <iostream>
 #include <vector>
-
+#include "reaction.h"
 
 class simulationData
 {
@@ -10,6 +10,22 @@ public:
 
     simulationData(int cellsNumber);
     ~simulationData();
+
+
+    enum SpecieName
+    {
+       Ar,
+       Ar_star,
+       Ar_plus
+    };
+
+    enum ReactionName
+    {
+       eAr_eAr,
+       eAr_eArs,
+       eAr_2eArp,
+       eArs_2eArp
+    };
 
     struct simulationField
     {
@@ -48,6 +64,9 @@ public:
     simulationField* getFieldHeavySpicies(int num);
     int getHeavySpiciesCharge(int num);
     int getNumberHeavySpicies();
+    double getN(); //total number of particles in one m^3
+    double* getReactionRate(int num);
+    void calcReaction(int num);
     simulationParameters *getParameters();
 
 private:
@@ -61,6 +80,7 @@ private:
     std::vector<simulationField* > m_fieldsHeavySpecies;
     std::vector<int> m_chargeHeavySpecies;
     simulationParameters* m_params;
+    std::vector<reaction *> m_reactions;
 };
 
 #endif // SIMULATIONDATA_H

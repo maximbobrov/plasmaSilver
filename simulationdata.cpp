@@ -1,6 +1,7 @@
 #include "simulationdata.h"
 #include "string.h"
-
+#include "reaction.h"
+#include <QDebug>
 
 simulationData::simulationData(int iCellsNumber)
 {
@@ -16,6 +17,11 @@ simulationData::simulationData(int iCellsNumber)
     m_chargeHeavySpecies.push_back(1);
     m_numberHeavySpicies = m_fieldsHeavySpecies.size();
     m_params = new simulationData::simulationParameters(iCellsNumber);
+
+    m_reactions.push_back(new reactionEAr_EAr(this));
+    m_reactions.push_back(new reactionEAr_EArs(this));
+    m_reactions.push_back(new reactionEAr_2EArp(this));
+    m_reactions.push_back(new reactionEArs_2EArp(this));
 }
 
 simulationData::~simulationData()
@@ -66,6 +72,29 @@ int simulationData::getHeavySpiciesCharge(int num)
 int simulationData::getNumberHeavySpicies()
 {
     return m_numberHeavySpicies;
+}
+
+double simulationData::getN()
+{
+   // pv=nkT
+   // n/v=p/kT;
+    double pres=101505;
+    double T=300;
+    double k=1.38e-23;
+
+
+    return pres/(k*T);
+}
+
+double *simulationData::getReactionRate(int num)
+{
+    return m_reactions[num]->getR();
+}
+
+void simulationData::calcReaction(int num)
+{
+   // qDebug()<<"num="<<num<<" si="<<m_reactions.size();
+    m_reactions[num]->calc();
 }
 
 simulationData::simulationField* simulationData::getFieldEnergy()
