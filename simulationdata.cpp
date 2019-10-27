@@ -86,15 +86,14 @@ double simulationData::getN()
     return pres/(k*T);
 }
 
-double *simulationData::getReactionRate(int num)
+double *simulationData::getReactionRate(simulationData::ReactionName reactName)
 {
-    return m_reactions[num]->getR();
+    return m_reactions[reactName]->getR();
 }
 
-void simulationData::calcReaction(int num)
+void simulationData::calcReaction(simulationData::ReactionName reactName)
 {
-   // qDebug()<<"num="<<num<<" si="<<m_reactions.size();
-    m_reactions[num]->calc();
+    m_reactions[reactName]->calc();
 }
 
 simulationData::simulationField* simulationData::getFieldEnergy()

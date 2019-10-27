@@ -1,7 +1,6 @@
 #include "reaction.h"
 #include "simulationdata.h"
 
-#include <QDebug>
 
 static const int g_EAr_EAr_num =67;
 
@@ -59,7 +58,7 @@ reactionEAr_EAr::reactionEAr_EAr(simulationData *data):reaction(data)
 {
     if (data != nullptr)
     {
-        m_cs=new crossSection(30,g_EAr_EAr_num,30);
+        m_cs=new crossSection(36,g_EAr_EAr_num,12);
         m_cs->fillSigmas2(g_EAr_EAr,g_EAr_EAr_num); //fill from static arrays (safer then messing up with external txt files)
     }
 }
@@ -74,7 +73,9 @@ void reactionEAr_EAr::calc()
 
     for (int i=0;i<m_pData->getCellsNumber();i++)
     {
-        m_R[i]=0.0;//m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
+        int a=m_pData->getCellsNumber();
+        m_R[i]= 0.0;//m_cs->getSpline(i*100.0/m_pData->getCellsNumber());
+        //m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
     }
 }
 
@@ -82,7 +83,7 @@ reactionEAr_EArs::reactionEAr_EArs(simulationData *data):reaction(data)
 {
     if (data != nullptr)
     {
-        m_cs=new crossSection(30,g_EAr_EArs_num,30);
+        m_cs=new crossSection(36,g_EAr_EArs_num,12);
         m_cs->fillSigmas2(g_EAr_EArs,g_EAr_EArs_num);
     }
 }
@@ -97,7 +98,8 @@ void reactionEAr_EArs::calc()
 
     for (int i=0;i<m_pData->getCellsNumber();i++)
     {
-        m_R[i]=0.0;//m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
+        m_R[i]= 0.0;//m_cs->getSpline(i*100.0/m_pData->getCellsNumber());
+        //m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
     }
 }
 
@@ -105,7 +107,7 @@ reactionEAr_2EArp::reactionEAr_2EArp(simulationData *data):reaction(data)
 {
     if (data != nullptr)
     {
-        m_cs=new crossSection(30,g_EAr_2EArp_num,30);
+        m_cs=new crossSection(36,g_EAr_2EArp_num,12);
         m_cs->fillSigmas2(g_EAr_2EArp,g_EAr_2EArp_num);
     }
 }
@@ -120,7 +122,8 @@ void reactionEAr_2EArp::calc()
     double N=m_pData->getN();
     for (int i=0;i<m_pData->getCellsNumber();i++)
     {
-        m_R[i]=0.0;//m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
+       m_R[i] = 0.0;//m_cs->getSpline(i*100.0/m_pData->getCellsNumber());
+        //m_cs->getSpline(En[i])*N*Ar[i]*Ne[i]*0.0;
     }
 }
 
@@ -128,7 +131,7 @@ reactionEArs_2EArp::reactionEArs_2EArp(simulationData *data):reaction(data)
 {
     if (data != nullptr)
     {
-        m_cs=new crossSection(30,g_EArs_2EArp_num,30);
+        m_cs=new crossSection(36,g_EArs_2EArp_num,12);
         m_cs->fillSigmas2(g_EArs_2EArp,g_EArs_2EArp_num);
     }
 }
@@ -145,6 +148,7 @@ void reactionEArs_2EArp::calc()
 
     for (int i=0;i<m_pData->getCellsNumber();i++)
     {
-        m_R[i]=0.0;//m_cs->getSpline(En[i])*N*Ars[i]*Ne[i]*0.0;
+        m_R[i] = 0.0;//m_cs->getSpline(i*100.0/m_pData->getCellsNumber());
+        //m_cs->getSpline(En[i])*N*Ars[i]*Ne[i]*0.0;
     }
 }

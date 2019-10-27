@@ -188,8 +188,12 @@ void MainWindow::initData()
     addPlot(m_fPhi->arr, m_fPhi->name, m_fPhi->cellsNumber, 100);
     for (int j = 0; j < m_numberHeavySpicies; ++j)
     {
-        addPlot(m_fHeavy[j]->arr, m_fHeavy[j]->name, m_fHeavy[j]->cellsNumber);
+      addPlot(m_fHeavy[j]->arr, m_fHeavy[j]->name, m_fHeavy[j]->cellsNumber);
     }
+    addPlot(m_data->getReactionRate(simulationData::ReactionName::eAr_eAr), "eAr_eAr" ,m_fNe->cellsNumber, 0.5e12);
+    addPlot(m_data->getReactionRate(simulationData::ReactionName::eAr_eArs), "eAr_eArs" ,m_fNe->cellsNumber,0.5e12);
+    addPlot(m_data->getReactionRate(simulationData::ReactionName::eAr_2eArp), "eAr_2eArp" ,m_fNe->cellsNumber,0.5e12);
+    addPlot(m_data->getReactionRate(simulationData::ReactionName::eArs_2eArp), "eArs_2eArp" ,m_fNe->cellsNumber,0.5e12);
     for (int i = 0; i < m_checkBoxes.size(); ++i) {
         connect(m_checkBoxes[i], SIGNAL(stateChanged(int)), this, SLOT(replotGraph(int)));
     }

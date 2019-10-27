@@ -65,8 +65,8 @@ public:
     int getHeavySpiciesCharge(int num);
     int getNumberHeavySpicies();
     double getN(); //total number of particles in one m^3
-    double* getReactionRate(int num);
-    void calcReaction(int num);
+    double* getReactionRate(simulationData::ReactionName reactName);
+    void calcReaction(ReactionName reactName);
     simulationParameters *getParameters();
 
 private:

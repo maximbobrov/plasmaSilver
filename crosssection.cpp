@@ -103,26 +103,6 @@ void crossSection::fillSigmas(double *sNew, double *eNew, int n)
     fillK();
 }
 
-void crossSection::fillSigmas2(double esNew[][2], int n)
-{
-    m_sigNum=n;
-    if (m_sigmas!=NULL)
-    {
-        delete[] m_sigmas;
-        delete[] m_energs;
-    }
-
-    m_sigmas = new double[m_sigNum];
-    m_energs = new double[m_sigNum];
-
-    for (int i=0;i<m_sigNum;i++)
-    {
-        m_sigmas[i]=esNew[i][0];
-        m_energs[i]=esNew[i][1];
-    }
-    fillK();
-}
-
 void crossSection::buildSpline()
 {
     int n=m_splNum;
@@ -181,6 +161,30 @@ double crossSection::getSpline(double xp)
 
 }
 
+void crossSection::fillSigmas2(double esNew[][2], int n)
+{
+    m_sigNum=n;
+    if (m_sigmas!=NULL)
+    {
+        delete[] m_sigmas;
+        delete[] m_energs;
+    }
+
+    m_sigmas = new double[m_sigNum];
+    m_energs = new double[m_sigNum];
+
+    qDebug()<<"1n="<< m_sigNum;
+    for (int i=0;i<m_sigNum;i++)
+    {
+        m_sigmas[i]=esNew[i][1];
+        m_energs[i]=esNew[i][0];
+        qDebug()<<m_sigmas[i]<<" "<<m_energs[i];
+
+
+    }
+    fillK();
+}
+
 void crossSection::readFromFile(char *fileName)
 {
     FILE* file=fopen(fileName,"r");
@@ -219,6 +223,7 @@ void crossSection::readFromFile(char *fileName)
 
     m_sigmas = new double[m_sigNum];
     m_energs = new double[m_sigNum];
+
 
     for (int i=0;i<m_sigNum;i++)
     {
