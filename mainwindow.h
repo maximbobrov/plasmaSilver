@@ -45,6 +45,7 @@ public slots:
     void initData();
     void updateData();
     void simulateData(bool);
+    void drawDebug(bool);
     void replotGraph(int);
 private:
     QWidget* m_widget;
@@ -58,6 +59,7 @@ private:
     QScrollBar* m_scrollBar;
     QVector<QCheckBox*> m_checkBoxes;
     QPushButton* m_simulateButton;
+    QPushButton* m_debugButton;
     simulationData* m_data;
     solverNe* m_sNe;
     solverEnergy* m_sEn;
@@ -78,6 +80,7 @@ private:
 private:
     void saveInStorage();
     void addPlot(double* arr,char* name, int size, double scale = 1.0);
+    void addPlotXY(double *arr,double*xx, char *name, int size, double scale = 1.0);
 };
 
 #endif // MAINWINDOW_H

@@ -8,11 +8,12 @@ class simulationSolver
 public:
 
     simulationSolver(simulationData* pData = nullptr);
-    double updateParams();
+
 
     virtual double solve(int numberIteration);
     virtual double getRhs();
-    virtual double getStepEuler();
+    virtual void getStepEuler();
+    virtual void setBc();
 
     virtual ~simulationSolver();
 
@@ -57,6 +58,7 @@ class solverHeavySpicies : public simulationSolver
 public:
     solverHeavySpicies(simulationData* pData = nullptr, int num = 0);
     virtual double getRhs();
+
 
     virtual ~solverHeavySpicies();
 private:

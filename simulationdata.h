@@ -24,7 +24,8 @@ public:
        eAr_eAr,
        eAr_eArs,
        eAr_2eArp,
-       eArs_2eArp
+       eArs_2eArp,
+        comsol_eAr_2eArp
     };
 
     struct simulationField
@@ -47,6 +48,11 @@ public:
         double* arrMuomega;
         double* arrE;
         int cellsNumber;
+        double rho; //mixture density
+        double p; //pressure
+        double T; //temperature
+        double mAr; //argon molar mass
+        double N; //neutral number denisty
         simulationParameters(int cellsNumber);
         private: void init(int cellsNumber);
     };
@@ -58,6 +64,7 @@ public:
     int getCellsNumber();
     double getDt();
     double getDz();
+    void updateParams();
     simulationField* getFieldNe();
     simulationField* getFieldEnergy();
     simulationField* getFieldPhi();
@@ -66,6 +73,8 @@ public:
     int getNumberHeavySpicies();
     double getN(); //total number of particles in one m^3
     double* getReactionRate(simulationData::ReactionName reactName);
+    double getReactionDe(simulationData::ReactionName reactName);
+
     void calcReaction(ReactionName reactName);
     simulationParameters *getParameters();
 

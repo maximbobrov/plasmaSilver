@@ -10,6 +10,7 @@ class reaction
 public:
     reaction(simulationData* data);// = nullptr);
     virtual void calc();
+    virtual double getDe();
     double *getR();
 protected:
     double *m_R;
@@ -46,9 +47,23 @@ class reactionEAr_2EArp:public reaction //e+Ar=>2e+Ar+  Ionization
 public:
     reactionEAr_2EArp(simulationData* data);// = nullptr);
     virtual void calc();
+     virtual double getDe();
 private:
     double m_energy =  15.80;// eV threshold energy
     crossSection * m_cs;
+};
+
+
+
+class reactionEAr_2EArp_comsol:public reaction //e+Ar=>2e+Ar+  Ionization
+{
+public:
+    reactionEAr_2EArp_comsol(simulationData* data);// = nullptr);
+    virtual void calc();
+     virtual double getDe();
+private:
+    double m_energy =  15.80;// eV threshold energy
+    splineInterp * m_spline;
 };
 
 class reactionEArs_2EArp:public reaction //e+Ars=>2e+Ar+  Ionization
