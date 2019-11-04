@@ -46,6 +46,7 @@ public:
         double* arrMue;
         double* arrMueps;
         double* arrMuomega;
+        double* arrTe;
         double* arrE;
         int cellsNumber;
         double rho; //mixture density
@@ -57,6 +58,9 @@ public:
         private: void init(int cellsNumber);
     };
 
+    const double q=1.6022e-19; //coulumbs elementary charge
+    const double k_B_const=1.3806e-23;// boltzmann constant
+
     void setDt(double dt = 0.000003);
     void setDz(double dz = 0.01);
     void setCellsNumber(int cellsNumber);
@@ -65,6 +69,7 @@ public:
     double getDt();
     double getDz();
     void updateParams();
+    double* getArrTe();
     simulationField* getFieldNe();
     simulationField* getFieldEnergy();
     simulationField* getFieldPhi();

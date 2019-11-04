@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <stdio.h>
 
-#define NZ 100
+#define NZ 400
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -44,15 +44,17 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     m_data = new simulationData(NZ);
-    m_data->setDt();
-    m_data->setDz();
+
+    m_data->setDz(2e-4/NZ);
+     m_data->setDt(5e-12);
+
     m_sNe = new solverNe(m_data);
     m_sEn = new solverEnergy(m_data);
     m_sPhi = new solverPhi(m_data);
 
     m_textStartTime->setText(QString().number(0.0));
     m_textDeltaTime->setText(QString().number(m_data->getDt()));
-    m_textEndTime->setText(QString().number(0.0001));
+    m_textEndTime->setText(QString().number(1e-9));
 
 
     connect (m_simulateButton, SIGNAL(clicked(bool)), this, SLOT(simulateData(bool)));
@@ -65,11 +67,11 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(m_widget);
     setWindowTitle("PlasmaSolver");
     m_animStopped=true;
+  //  initData();
 }
 
 MainWindow::~MainWindow()
 {
-
 
 }
 
@@ -80,7 +82,7 @@ void MainWindow::replotGraph(int number)
     m_plots.clear();
     m_plots = m_storage[m_scrollBar->value()].plots;
     m_customPlot->clearGraphs();
-    m_customPlot->xAxis->setLabel("x");
+    m_customPlot->xAxis->setLabel(QString("x, time= %1").arg(m_time));
     m_customPlot->yAxis->setLabel("y");
     QColor colors[6] = {QColor(255,0,0),QColor(0,255,0),QColor(0,0,255),QColor(255,255,0),QColor(0,255,255),QColor(255,0,255)};
     for (int j = 0; j < m_plots.size(); ++j)
@@ -193,40 +195,40 @@ void MainWindow::initData()
         m_sHeavy.push_back(new solverHeavySpicies(m_data, j));
     }
 
+   // m_data->setDz(2e-4/NZ);
+   //  m_data->setDt(1e-14);
+
+        simulationData::simulationParameters* pParams=m_data->getParameters();
     for (int i = 0; i < NZ; ++i) {
-        m_fNe->arr[i] = simulationTools::gauss(i-2*NZ/3, 10);
-        m_fNe->arrPrev[i] = simulationTools::gauss(i-2*NZ/3, 10);
-        m_fEnergy->arr[i] = simulationTools::gauss(i-NZ/2, 10);
-        m_fEnergy->arrPrev[i] = simulationTools::gauss(i-NZ/2, 10);
+
+        double x_=i*m_data->getDz();
+        m_fNe->arr[i] =1e5+ 1e11*simulationTools::gauss(x_-1e-4, 2e-5);
+        m_fNe->arrPrev[i] =m_fNe->arr[i];
+        m_fEnergy->arr[i] = 5.0*m_fNe->arr[i];
+        m_fEnergy->arrPrev[i] = m_fEnergy->arr[i];
         m_fPhi->arr[i] = 0.0;
         m_fPhi->arrPrev[i] = 0.0;
         for (int j = 0; j < m_numberHeavySpicies; ++j)
         {
-            m_fHeavy[j]->arr[i] = simulationTools::gauss(i-NZ/3, 2) / m_numberHeavySpicies;
-            m_fHeavy[j]->arrPrev[i] = simulationTools::gauss(i-NZ/3, 2) / m_numberHeavySpicies;
+            m_fHeavy[j]->arr[i] =(m_fNe->arr[i]*pParams->T*8.314)/(pParams->p*6.022e23);
+            m_fHeavy[j]->arrPrev[i] = m_fHeavy[j]->arr[i];
         }
     }
+    m_data->updateParams();
+
     m_plots.clear();
     while (QLayoutItem* item = m_vLayoutCheckBoxes->takeAt(0)) {
         delete item->widget();
         delete item;
     }
     addPlot(m_fNe->arr, m_fNe->name ,m_fNe->cellsNumber);
-    addPlot(m_fEnergy->arr, m_fEnergy->name, m_fEnergy->cellsNumber);
-    addPlot(m_fPhi->arr, m_fPhi->name, m_fPhi->cellsNumber, 100);
+    addPlot(pParams->arrTe, m_fEnergy->name, m_fEnergy->cellsNumber);
+    addPlot(pParams->arrE, m_fPhi->name, m_fPhi->cellsNumber-1, 1.0);
     for (int j = 0; j < m_numberHeavySpicies; ++j)
     {
       addPlot(m_fHeavy[j]->arr, m_fHeavy[j]->name, m_fHeavy[j]->cellsNumber);
     }
-    // addPlot(m_data->getReactionRate(simulationData::ReactionName::eAr_eAr), "eAr_eAr" ,m_fNe->cellsNumber, 0.5e12);
-    // addPlot(m_data->getReactionRate(simulationData::ReactionName::eAr_eArs), "eAr_eArs" ,m_fNe->cellsNumber,0.5e12);
 
-  //  m_data->calcReaction(simulationData::ReactionName::eAr_2eArp);
-  //  addPlot(m_data->getReactionRate(simulationData::ReactionName::eAr_2eArp), "eAr_2eArp" ,m_fNe->cellsNumber,0.5e12);
-
-    // replotGraph(0);
-
-    // addPlot(m_data->getReactionRate(simulationData::ReactionName::eArs_2eArp), "eArs_2eArp" ,m_fNe->cellsNumber,0.5e12);
     for (int i = 0; i < m_checkBoxes.size(); ++i) {
         connect(m_checkBoxes[i], SIGNAL(stateChanged(int)), this, SLOT(replotGraph(int)));
     }
@@ -254,8 +256,7 @@ void MainWindow::updateData()
     {
         m_sHeavy[j]->getStepEuler();
     }
-    saveInStorage();
-    replotGraph(m_storage.size()-1);
+
 }
 
 void MainWindow::simulateData(bool status)
@@ -266,8 +267,15 @@ void MainWindow::simulateData(bool status)
         m_animStopped=false;
         while(!m_animStopped &&  m_time <= (m_textEndTime->text().toDouble() - m_textStartTime->text().toDouble()))
         {
-            m_time += m_textDeltaTime->text().toDouble();
+            m_time += 10.0*m_textDeltaTime->text().toDouble();
+            for (int i=0;i<10;i++)
+            {
             updateData();
+            }
+
+            saveInStorage();
+            replotGraph(m_storage.size()-1);
+
             QCoreApplication::processEvents();
             m_scrollBar->setRange(0, m_storage.size() - 1);
             m_scrollBar->setValue(m_storage.size() - 1);

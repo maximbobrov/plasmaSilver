@@ -10,12 +10,12 @@ simulationData::simulationData(int iCellsNumber)
     m_fieldNe = new simulationField(iCellsNumber,"electrons");
     m_fieldEnergy = new simulationField(iCellsNumber,"energy");
     m_fieldPhi = new simulationField(iCellsNumber+1,"potential");
-    m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ar"));
+    m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ar+"));
     m_chargeHeavySpecies.push_back(0);
  //   m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ars"));
   //  m_chargeHeavySpecies.push_back(1);
-    m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ar+"));
-    m_chargeHeavySpecies.push_back(1);
+  //  m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ar+"));
+   // m_chargeHeavySpecies.push_back(1);
     m_numberHeavySpicies = m_fieldsHeavySpecies.size();
     m_params = new simulationData::simulationParameters(iCellsNumber);
 
@@ -60,6 +60,12 @@ simulationData::simulationField* simulationData::getFieldNe()
 {
     return m_fieldNe;
 }
+
+double *simulationData::getArrTe()
+{
+   return m_params->arrTe;
+}
+
 
 simulationData::simulationField* simulationData::getFieldHeavySpicies(int num)
 {
@@ -150,6 +156,7 @@ void simulationData::simulationParameters::init(int iCellsNumber)
     arrMueps = new double[iCellsNumber];
     arrMuomega = new double[iCellsNumber];
     arrE = new double[iCellsNumber];
+    arrTe = new double[iCellsNumber];
 
     T=400; //K
     p=101325;//pa
@@ -157,25 +164,36 @@ void simulationData::simulationParameters::init(int iCellsNumber)
     rho=p*mAr/(8.314*T);//kg/m^3
     double Na=6.022e23; //1/mol
     N=p*Na/(8.314*T);
+
 }
 
 void simulationData::updateParams()
 {
     simulationData::simulationParameters* pParams = m_params;
     simulationData::simulationField* pEn = m_fieldEnergy;
+    simulationData::simulationField* pNe = m_fieldNe;
     simulationData::simulationField* pPhi = m_fieldPhi;
     double dz = m_dz;
+
+
     for (int j=0; j<pParams->cellsNumber; j++)
     {
-        pParams->arrMue[j] =2.6e3;//4e4;
+        pParams->arrMue[j] =4e24/m_params->N; ; //4e4; m^2/(V*s)
         pParams->arrMueps[j] =5.0 * pParams->arrMue[j] / 3.0;
-        pParams->arrDe[j] = pParams->arrMue[j] * 2.0*pEn->arr[j] / 3.0;
-        pParams->arrDeps[j] = pParams->arrMueps[j] * 2.0 * pEn->arr[j] / 3.0;
+
+        pParams->arrTe[j]=(2.0/3.0)*fabs(pEn->arr[j])/(fabs(pNe->arr[j])+1);
+        if (pParams->arrTe[j]>60.0) pParams->arrTe[j]=60.0; //some limiter here
+
+
+        pParams->arrDe[j] = pParams->arrMue[j] * pParams->arrTe[j];
+        pParams->arrDeps[j] = pParams->arrMueps[j] * pParams->arrTe[j];
         pParams->arrE[j] = - simulationTools::ddzCentral(pPhi->arr, pPhi->cellsNumber, dz, j);
-        pParams->arrMuomega[j]=8.0e3/760.0;
-        pParams->arrDomega[j] = 0.15;
+        pParams->arrDomega[j] = 0.01;// m^2/s
+        pParams->arrMuomega[j]=pParams->arrDomega[j]*q/(k_B_const*pParams->T);
+
     }
 }
+
 
 
 simulationData::simulationParameters::simulationParameters(int iCellsNumber)

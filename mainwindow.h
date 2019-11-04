@@ -12,12 +12,10 @@
 #include <QVector>
 #include <QCheckBox>
 
-
-
 #include "simulationdata.h"
 #include "simulationsolver.h"
 #include "simulationtools.h"
-#include "crosssection.h"
+
 
 class MainWindow : public QMainWindow
 {
@@ -70,7 +68,7 @@ private:
     simulationData::simulationField* m_fEnergy;
     simulationData::simulationField* m_fPhi;
     QVector<simulationData::simulationField*> m_fHeavy;
-    crossSection* m_crossSection;
+
     QVector<plotStruct> m_plots;
     QVector<storeStruct> m_storage;
     double m_maxY, m_minY;
