@@ -104,5 +104,18 @@ private:
 };
 
 
+class reactionEArs_EAr_comsol:public reaction //e+Ars=>e+Ar  EXCITATION
+{
+public:
+    reactionEArs_EAr_comsol(simulationData* data);// = nullptr);
+   // virtual void calc();
+     virtual double getDe();
+private:
+    double m_energy =  11.50 ; //excitation energy eV
+    double m_wRat = 12;  // statistical weight ratio of initial state to the excited state
+    int m_Detailed = 1; //use detailed balance (if 0-- otherwise)
+   // crossSection * m_cs;
+};
+
 
 #endif // REACTION_H

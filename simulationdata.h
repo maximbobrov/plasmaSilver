@@ -14,20 +14,23 @@ public:
 
     enum SpecieName
     {
+
+        Ar_plus,
+        Ar_star,
+
         e,
         En,
         phi,
-       Ar,
-       Ar_star,
-       Ar_plus
+        Ar
     };
 
     enum ReactionName
     {
-       comsol_eAr_eAr,
-       comsol_eAr_eArs,
-       comsol_eAr_2eArp,
-       comsol_eArs_2eArp
+        comsol_eAr_eAr,
+        comsol_eAr_eArs,
+        comsol_eArs_eAr,
+        comsol_eAr_2eArp,
+        comsol_eArs_2eArp
         //comsol_eAr_2eArp
     };
 
@@ -39,7 +42,7 @@ public:
         int cellsNumber;
         simulationData::SpecieName m_specie;
         simulationField(int cellsNumber, char* name,simulationData::SpecieName specie);
-        private: void init(int cellsNumber, char* name,simulationData::SpecieName specie);
+    private: void init(int cellsNumber, char* name,simulationData::SpecieName specie);
     };
 
     struct simulationParameters
@@ -59,7 +62,7 @@ public:
         double mAr; //argon molar mass
         double N; //neutral number denisty
         simulationParameters(int cellsNumber);
-        private: void init(int cellsNumber);
+    private: void init(int cellsNumber);
     };
 
     const double q=1.6022e-19; //coulumbs elementary charge

@@ -2,6 +2,7 @@
 #include "simulationtools.h"
 #include "string.h"
 #include "reaction.h"
+#include "math.h"
 #include <QDebug>
 
 simulationData::simulationData(int iCellsNumber)
@@ -15,13 +16,13 @@ simulationData::simulationData(int iCellsNumber)
     m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ars",simulationData::SpecieName::Ar_star));
     m_chargeHeavySpecies.push_back(0);
 
-  //  m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ar+"));
-   // m_chargeHeavySpecies.push_back(1);
+
     m_numberHeavySpicies = m_fieldsHeavySpecies.size();
     m_params = new simulationData::simulationParameters(iCellsNumber);
 
     m_reactions.push_back(new reactionEAr_EAr_comsol(this));
     m_reactions.push_back(new reactionEAr_EArs_comsol(this));
+    m_reactions.push_back(new reactionEArs_EAr_comsol(this));
     m_reactions.push_back(new reactionEAr_2EArp_comsol(this));
     m_reactions.push_back(new reactionEArs_2EArp_comsol(this));
 

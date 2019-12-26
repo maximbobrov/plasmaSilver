@@ -44,6 +44,12 @@ static double comsol_EAr_EArs[comsol_EAr_EArs_num][2] = {
     #include "comsol/e+Ar_e+Ars.txt"
 };
 
+static const int comsol_EArs_EAr_num =201;
+
+static double comsol_EArs_EAr[comsol_EArs_EAr_num][2] = {
+    #include "comsol/e+Ars_e+Ar.txt"
+};
+
 static const int comsol_EArs_2EArp_num =201;
 
 static double comsol_EArs_2EArp[comsol_EArs_2EArp_num][2] = {
@@ -130,6 +136,29 @@ reactionEAr_EArs_comsol::reactionEAr_EArs_comsol(simulationData *data):reaction(
 
 
 double reactionEAr_EArs_comsol::getDe()
+{
+return m_energy;
+}
+
+reactionEArs_EAr_comsol::reactionEArs_EAr_comsol(simulationData *data):reaction(data)
+{
+   /* if (data != nullptr)
+    {
+        m_cs=new crossSection(36,g_EAr_EArs_num,12);
+        m_cs->fillSigmas2(g_EAr_EArs,g_EAr_EArs_num);
+    }*/
+
+    if (data != nullptr)
+    {
+        m_spline=new splineInterp(20);
+
+        m_spline->fillData(comsol_EArs_EAr,comsol_EArs_EAr_num);
+        //m_cs->fillSigmas2(g_EArs_2EArp,g_EArs_2EArp_num);
+    }
+}
+
+
+double reactionEArs_EAr_comsol::getDe()
 {
 return m_energy;
 }
