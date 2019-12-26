@@ -7,23 +7,24 @@
 simulationData::simulationData(int iCellsNumber)
 {
     m_defaultCellsNumber = iCellsNumber;
-    m_fieldNe = new simulationField(iCellsNumber,"electrons");
-    m_fieldEnergy = new simulationField(iCellsNumber,"energy");
-    m_fieldPhi = new simulationField(iCellsNumber+1,"potential");
-    m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ar+"));
+    m_fieldNe = new simulationField(iCellsNumber,"electrons",simulationData::SpecieName::e);
+    m_fieldEnergy = new simulationField(iCellsNumber,"energy",simulationData::SpecieName::En);
+    m_fieldPhi = new simulationField(iCellsNumber+1,"potential",simulationData::SpecieName::phi);
+    m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ar+",simulationData::SpecieName::Ar_plus));
+    m_chargeHeavySpecies.push_back(1);
+    m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ars",simulationData::SpecieName::Ar_star));
     m_chargeHeavySpecies.push_back(0);
- //   m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ars"));
-  //  m_chargeHeavySpecies.push_back(1);
+
   //  m_fieldsHeavySpecies.push_back(new simulationField(iCellsNumber,"Ar+"));
    // m_chargeHeavySpecies.push_back(1);
     m_numberHeavySpicies = m_fieldsHeavySpecies.size();
     m_params = new simulationData::simulationParameters(iCellsNumber);
 
-    m_reactions.push_back(new reactionEAr_EAr(this));
-    m_reactions.push_back(new reactionEAr_EArs(this));
-    m_reactions.push_back(new reactionEAr_2EArp(this));
-    m_reactions.push_back(new reactionEArs_2EArp(this));
+    m_reactions.push_back(new reactionEAr_EAr_comsol(this));
+    m_reactions.push_back(new reactionEAr_EArs_comsol(this));
     m_reactions.push_back(new reactionEAr_2EArp_comsol(this));
+    m_reactions.push_back(new reactionEArs_2EArp_comsol(this));
+
 }
 
 simulationData::~simulationData()
@@ -129,13 +130,13 @@ int simulationData::getCellsNumber()
     return m_defaultCellsNumber;
 }
 
-simulationData::simulationField::simulationField(int iCellsNumber, char* iName)
+simulationData::simulationField::simulationField(int iCellsNumber, char* iName,SpecieName specie)
 {
 
-    init(iCellsNumber, iName);
+    init(iCellsNumber, iName,specie);
 }
 
-void simulationData::simulationField::init(int iCellsNumber, char* iName)
+void simulationData::simulationField::init(int iCellsNumber, char* iName, SpecieName specie)
 {
   cellsNumber =  iCellsNumber;
   arr = new double[iCellsNumber];
@@ -144,6 +145,7 @@ void simulationData::simulationField::init(int iCellsNumber, char* iName)
   name = new char[len+1];
   name[len]=0;
   strcpy(name, iName);
+  m_specie=specie;
 }
 
 void simulationData::simulationParameters::init(int iCellsNumber)

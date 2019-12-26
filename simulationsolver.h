@@ -63,6 +63,7 @@ public:
     virtual ~solverHeavySpicies();
 private:
     int m_charge;
+    simulationData::SpecieName m_specie;
 };
 
 #endif // SIMULATIONSOLVER_H

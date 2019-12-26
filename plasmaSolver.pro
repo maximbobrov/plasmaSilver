@@ -54,3 +54,8 @@ DISTFILES += \
     reactions/e+Ar_e+Ars.txt \
     reactions/e+Ars_2e+Ar+.txt \
     comsol/e+Ar_2e+Ar+.txt
+
+OTHER_FILES += \
+    comsol/e+Ar_e+Ar.txt \
+    comsol/e+Ar_e+Ars.txt \
+    comsol/e+Ars_2e+Ar+.txt
