@@ -205,3 +205,30 @@ double reactionEAr_2EArp_comsol::getDe()
 {
 return m_energy;
 }
+
+reactionArsArs_EArArp_comsol::reactionArsArs_EArArp_comsol(simulationData *data):reaction(data)
+{
+
+}
+
+void reactionArsArs_EArArp_comsol::calc()
+{
+    for (int i=0;i<m_pData->getCellsNumber();i++)
+    {
+       m_R[i] = m_k;
+    }
+}
+
+reactionArsAr_ArAr_comsol::reactionArsAr_ArAr_comsol(simulationData *data):reaction(data)
+{
+
+}
+
+void reactionArsAr_ArAr_comsol::calc()
+{
+    for (int i=0;i<m_pData->getCellsNumber();i++)
+    {
+       m_R[i] = m_k;
+    }
+}
+

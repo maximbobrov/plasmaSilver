@@ -25,6 +25,8 @@ simulationData::simulationData(int iCellsNumber)
     m_reactions.push_back(new reactionEArs_EAr_comsol(this));
     m_reactions.push_back(new reactionEAr_2EArp_comsol(this));
     m_reactions.push_back(new reactionEArs_2EArp_comsol(this));
+    m_reactions.push_back(new reactionArsArs_EArArp_comsol(this));
+    m_reactions.push_back(new reactionArsAr_ArAr_comsol(this));
 
 }
 

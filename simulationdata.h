@@ -30,7 +30,9 @@ public:
         comsol_eAr_eArs,
         comsol_eArs_eAr,
         comsol_eAr_2eArp,
-        comsol_eArs_2eArp
+        comsol_eArs_2eArp,
+        comsol_ArsArs_EArArp,
+        comsol_ArsAr_ArAr
         //comsol_eAr_2eArp
     };
 
