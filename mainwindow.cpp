@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_data = new simulationData(NZ);
 
-    m_data->setDz(2e-4/NZ);
+    m_data->setDz(0.368/NZ);
      m_data->setDt(5e-12);
 
     m_sNe = new solverNe(m_data);
@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_textStartTime->setText(QString().number(0.0));
     m_textDeltaTime->setText(QString().number(m_data->getDt()));
-    m_textEndTime->setText(QString().number(1e-9));
+    m_textEndTime->setText(QString().number(1e-6));
 
 
     connect (m_simulateButton, SIGNAL(clicked(bool)), this, SLOT(simulateData(bool)));
@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(m_widget);
     setWindowTitle("PlasmaSolver");
     m_animStopped=true;
-  //  initData();
+    initData();
 }
 
 MainWindow::~MainWindow()
@@ -202,17 +202,20 @@ void MainWindow::initData()
     for (int i = 0; i < NZ; ++i) {
 
         double x_=i*m_data->getDz();
-        m_fNe->arr[i] =1e5+ 1e11*simulationTools::gauss(x_-1e-4, 2e-5);
+        m_fNe->arr[i] =1e13;//1e5+ 1e11*simulationTools::gauss(x_-1e-4, 2e-5);
         m_fNe->arrPrev[i] =m_fNe->arr[i];
-        m_fEnergy->arr[i] = 5.0*m_fNe->arr[i];
+        m_fEnergy->arr[i] = 4.0*m_fNe->arr[i];
         m_fEnergy->arrPrev[i] = m_fEnergy->arr[i];
+
+        //for (int j = 0; j < m_numberHeavySpicies; ++j)
+        {
+            m_fHeavy[simulationData::SpecieName::Ar_plus]->arr[i] =(m_fNe->arr[i]*pParams->T*8.314)/(pParams->p*6.022e23);
+            m_fHeavy[simulationData::SpecieName::Ar_plus]->arrPrev[i] = m_fHeavy[simulationData::SpecieName::Ar_plus]->arr[i];
+            m_fHeavy[simulationData::SpecieName::Ar_star]->arr[i] =1e-11;
+            m_fHeavy[simulationData::SpecieName::Ar_star]->arrPrev[i] = m_fHeavy[simulationData::SpecieName::Ar_star]->arr[i];
+        }
         m_fPhi->arr[i] = 0.0;
         m_fPhi->arrPrev[i] = 0.0;
-        for (int j = 0; j < m_numberHeavySpicies; ++j)
-        {
-            m_fHeavy[j]->arr[i] =(m_fNe->arr[i]*pParams->T*8.314)/(pParams->p*6.022e23);
-            m_fHeavy[j]->arrPrev[i] = m_fHeavy[j]->arr[i];
-        }
     }
     m_data->updateParams();
 
@@ -223,7 +226,7 @@ void MainWindow::initData()
     }
     addPlot(m_fNe->arr, m_fNe->name ,m_fNe->cellsNumber);
     addPlot(pParams->arrTe, m_fEnergy->name, m_fEnergy->cellsNumber);
-    addPlot(pParams->arrE, m_fPhi->name, m_fPhi->cellsNumber-1, 1.0);
+    addPlot(m_fPhi->arr, m_fPhi->name, m_fPhi->cellsNumber-1, 1.0);
     for (int j = 0; j < m_numberHeavySpicies; ++j)
     {
       addPlot(m_fHeavy[j]->arr, m_fHeavy[j]->name, m_fHeavy[j]->cellsNumber);
@@ -235,11 +238,12 @@ void MainWindow::initData()
     m_scrollBar->setRange(0,1);
     m_storage.clear();
     saveInStorage();
+    replotGraph(0);
 }
 
 void MainWindow::updateData()
 {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         m_data->updateParams();
         m_sNe->solve(5);
@@ -248,8 +252,11 @@ void MainWindow::updateData()
         {
             m_sHeavy[j]->solve(5);
         }
-        m_sPhi->solve(500);
+        m_sPhi->solve(50);
+
     }
+
+    m_data->setDt(5e-12*(1+m_time*1e8));
     m_sNe->getStepEuler();
     m_sEn->getStepEuler();
     for (int j = 0; j < m_numberHeavySpicies; ++j)
@@ -263,7 +270,7 @@ void MainWindow::simulateData(bool status)
 {
     if (status==true)
     {
-        initData();
+
         m_animStopped=false;
         while(!m_animStopped &&  m_time <= (m_textEndTime->text().toDouble() - m_textStartTime->text().toDouble()))
         {

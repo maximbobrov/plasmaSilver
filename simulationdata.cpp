@@ -90,12 +90,12 @@ double simulationData::getN()
 {
    // pv=nkT
    // n/v=p/kT;
-    double pres=101505;
-    double T=300;
+   // double pres=13.21;//101505;
+   // double T=293.15;
     double k=1.38e-23;
 
 
-    return pres/(k*T);
+    return m_params->p/(k*m_params->T);
 }
 
 double *simulationData::getReactionRate(simulationData::ReactionName reactName)
@@ -163,8 +163,8 @@ void simulationData::simulationParameters::init(int iCellsNumber)
     arrE = new double[iCellsNumber];
     arrTe = new double[iCellsNumber];
 
-    T=400; //K
-    p=101325;//pa
+    T=293.15; //K
+    p=13.21;//pa
     mAr=39.948/1000.0;//kg/mol
     rho=p*mAr/(8.314*T);//kg/m^3
     double Na=6.022e23; //1/mol
@@ -183,7 +183,7 @@ void simulationData::updateParams()
 
     for (int j=0; j<pParams->cellsNumber; j++)
     {
-        pParams->arrMue[j] =4e24/m_params->N; ; //4e4; m^2/(V*s)
+        pParams->arrMue[j] = 1e25 / m_params->N; ; //4e4; m^2/(V*s)
         pParams->arrMueps[j] =5.0 * pParams->arrMue[j] / 3.0;
 
         pParams->arrTe[j]=(2.0/3.0)*fabs(pEn->arr[j])/(fabs(pNe->arr[j])+1);
@@ -195,7 +195,6 @@ void simulationData::updateParams()
         pParams->arrE[j] = - simulationTools::ddzCentral(pPhi->arr, pPhi->cellsNumber, dz, j);
         pParams->arrDomega[j] = 0.01;// m^2/s
         pParams->arrMuomega[j]=pParams->arrDomega[j]*q/(k_B_const*pParams->T);
-
     }
 }
 

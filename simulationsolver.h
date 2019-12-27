@@ -29,7 +29,7 @@ class solverNe : public simulationSolver
 public:
     solverNe(simulationData* pData = nullptr);
     virtual double getRhs();
-
+    virtual void setBc();
     virtual ~solverNe();
 };
 
@@ -39,7 +39,7 @@ class solverEnergy : public simulationSolver
 public:
     solverEnergy(simulationData* pData = nullptr);
     virtual double getRhs();
-
+    virtual void setBc();
     virtual ~solverEnergy();
 };
 
@@ -49,7 +49,7 @@ public:
     solverPhi(simulationData* pData = nullptr);
     virtual double getRhs();
     virtual double solve(int numberIteration);
-
+    virtual void setBc();
     virtual ~solverPhi();
 };
 
@@ -59,7 +59,7 @@ public:
     solverHeavySpicies(simulationData* pData = nullptr, int num = 0);
     virtual double getRhs();
 
-
+    virtual void setBc();
     virtual ~solverHeavySpicies();
 private:
     int m_charge;
