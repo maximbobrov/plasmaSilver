@@ -12,6 +12,8 @@ public:
     virtual void calc();
     virtual double getDe();
     double *getR();
+    virtual double getRate(double eps);
+    virtual double getDeriv(double eps);
 protected:
     double *m_R;
     simulationData* m_pData;
@@ -122,6 +124,8 @@ class reactionArsArs_EArArp_comsol:public reaction //Ars+Ars=>e+Ar+Ar+
 public:
     reactionArsArs_EArArp_comsol(simulationData* data);
         virtual void calc();
+    virtual double getRate(double eps);
+    virtual double getDeriv(double eps);
 private:
     double m_k=3.3734e8;
 };
@@ -131,6 +135,8 @@ class reactionArsAr_ArAr_comsol:public reaction //Ars+Ar=>Ar+Ar
 public:
     reactionArsAr_ArAr_comsol(simulationData* data);
         virtual void calc();
+    virtual double getRate(double eps);
+    virtual double getDeriv(double eps);
 private:
     double m_k=1807;
 };

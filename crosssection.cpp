@@ -140,6 +140,17 @@ double splineInterp::getSpline(double xp)
 
 }
 
+double splineInterp::getPrime(double xp)
+{
+    int i=(int)(pow(xp-m_x0,m_xPow)/m_dXp);
+
+    if (i>m_splNum)
+        return m_splA[m_splNum];
+
+    double dx=xp-m_splX[i];
+    return m_splB[i]+2.0*m_splC[i]*dx+3.0*m_splD[i]*dx*dx;
+}
+
 splineInterp::~splineInterp()
 {
     if (m_splX!=nullptr)

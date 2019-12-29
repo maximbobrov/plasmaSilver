@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QDebug>
 #include <stdio.h>
+#include <reactionsolver.h>
 
 #define NZ 400
 
@@ -46,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_data = new simulationData(NZ);
 
     m_data->setDz(0.368/NZ);
-     m_data->setDt(5e-12);
+    m_data->setDt(5e-12);
 
     m_sNe = new solverNe(m_data);
     m_sEn = new solverEnergy(m_data);
@@ -195,10 +196,10 @@ void MainWindow::initData()
         m_sHeavy.push_back(new solverHeavySpicies(m_data, j));
     }
 
-   // m_data->setDz(2e-4/NZ);
-   //  m_data->setDt(1e-14);
+    // m_data->setDz(2e-4/NZ);
+    //  m_data->setDt(1e-14);
 
-        simulationData::simulationParameters* pParams=m_data->getParameters();
+    simulationData::simulationParameters* pParams=m_data->getParameters();
     for (int i = 0; i < NZ; ++i) {
 
         double x_=i*m_data->getDz();
@@ -229,7 +230,7 @@ void MainWindow::initData()
     addPlot(m_fPhi->arr, m_fPhi->name, m_fPhi->cellsNumber-1, 1.0);
     for (int j = 0; j < m_numberHeavySpicies; ++j)
     {
-      addPlot(m_fHeavy[j]->arr, m_fHeavy[j]->name, m_fHeavy[j]->cellsNumber);
+        addPlot(m_fHeavy[j]->arr, m_fHeavy[j]->name, m_fHeavy[j]->cellsNumber);
     }
 
     for (int i = 0; i < m_checkBoxes.size(); ++i) {
@@ -277,7 +278,7 @@ void MainWindow::simulateData(bool status)
             m_time += 10.0*m_textDeltaTime->text().toDouble();
             for (int i=0;i<10;i++)
             {
-            updateData();
+                updateData();
             }
 
             saveInStorage();
@@ -298,38 +299,107 @@ void MainWindow::simulateData(bool status)
 void MainWindow::drawDebug(bool)
 {
 
+    reactionSolver *solver=new reactionSolver(m_data);
 
 
-    QVector<double> xf,yf;
-
-    FILE* file=fopen( "c:\\user\\devel\\RFFI_petya\\electro\\arpp.txt","r");
-    double aa,bb;
-    char buf[1024];
-    int i=0;
-    while (fgets(buf,1024,file)!=NULL)
+/*
+    double e=0;
+    QVector<double> rr[7], dd[7] , ee;
+    while (e < 40)
     {
-        sscanf(buf,"%lf %lf", &aa,&bb);
-        xf.push_back(aa);
-        yf.push_back(bb*1e-10);
-        qDebug()<<"i="<<i<<" "<<xf[i]<<" "<<yf[i];
-        i++;
+        ee.push_back(e);
+        for (int i=0;i<7;i++)
+        {
+            rr[i].push_back(solver->m_reactions[i]->getRate(e));
+            dd[i].push_back(solver->m_reactions[i]->getDeriv(e));
+        }
+        e+=0.01;
     }
+    double m_maxY=-1e30;
+    double m_minY=+1e30;
 
 
-    m_data->calcReaction(simulationData::ReactionName::comsol_eAr_2eArp);
-    //addPlot(m_data->getReactionRate(simulationData::ReactionName::eAr_2eArp), "eAr_2eArp" ,m_fNe->cellsNumber,0.5e12);
+    double m_maxX=-1e30;
+    double m_minX=+1e30;
 
-    QVector<double> xv,yv;
+    m_customPlot->clearGraphs();
+    m_customPlot->xAxis->setLabel("x");
+    m_customPlot->yAxis->setLabel("y");
+    QColor colors[7] = {QColor(255,0,0),QColor(0,255,0),QColor(0,0,255),QColor(255,255,0),QColor(0,255,255),QColor(255,0,255),QColor(0,0,0)};
 
-    double *r=m_data->getReactionRate(simulationData::ReactionName::comsol_eAr_2eArp);
-    for (int i=0;i<m_data->getCellsNumber();i++)
+
+    for (int i=0;i<7;i++)
     {
-        yv.push_back(r[i]*1e-10);
-        xv.push_back(i*100.0/m_data->getCellsNumber());
 
-        //  qDebug()<<"i="<<i<<" "<<xv[i]<<" "<<yv[i];
+        m_customPlot->addGraph();
+        m_customPlot->graph(i)->setName(QString("num = ").number(i));
+        m_customPlot->graph(i)->setLineStyle((QCPGraph::LineStyle)(1));
+        m_customPlot->graph(i)->addToLegend();
+        m_customPlot->graph(i)->setData(ee,dd[i]);
+        QPen graphPen;
+        graphPen.setColor(colors[i]);
+        graphPen.setWidthF(1.5);
+        m_customPlot->graph(i)->setPen(graphPen);
+
+        for (int j=0; j < rr[i].size(); ++j)
+        {
+            if(rr[i][j] > m_maxY)
+                m_maxY = rr[i][j];
+            if(rr[i][j] < m_minY)
+                m_minY = rr[i][j];
+
+            if(ee[j] > m_maxX)
+                m_maxX = ee[j];
+            if(ee[j] < m_minX)
+                m_minX = ee[j];
+        }
     }
+    m_customPlot->xAxis->setRange(m_minX,m_maxX);
+    m_customPlot->yAxis->setRange(m_minY, m_maxY);
+    m_customPlot->legend->setVisible(true);
+    m_customPlot->replot();*/
 
+
+    qDebug()<<"aaa!";
+    solver->rhs_eps=0.0;
+    solver->rhs_nars=0.0;
+    solver->rhs_ne=0.0;
+
+    solver->ne_i=1e13;
+    solver->nars_i=1e5;
+    solver->n_n=1e15;
+    solver->eps_i=6.0;
+    solver->dt=1e-17;
+
+
+    QVector<double> ne,nars,eps,t;
+
+    //ne.push_back(solver->ne_i);
+    //nars.push_back(solver->nars_i);
+    //eps.push_back(solver->eps_i);
+    t.push_back(0.0);
+    for (int i=0;i<100;i++)
+    {
+
+        solver->solve(5);
+
+
+        ne.push_back(solver->ne_o);
+        nars.push_back(solver->nars_o);
+        eps.push_back(solver->eps_o);
+        t.push_back(solver->dt*i);
+
+        solver->ne_i=solver->ne_o;
+        solver->nars_i=solver->nars_o;
+        solver->eps_i=solver->eps_o;
+
+       /* if (solver->ne_i<1e5) solver->ne_i=1e5;
+        if (solver->eps_i<0.01) solver->eps_i=0.01;
+        if (solver->eps_i>40.0) solver->eps_i=40.0;
+
+        if (solver->nars_i<1e5) solver->nars_i=1e5;*/
+
+    }
 
 
 
@@ -346,52 +416,47 @@ void MainWindow::drawDebug(bool)
     QColor colors[6] = {QColor(255,0,0),QColor(0,255,0),QColor(0,0,255),QColor(255,255,0),QColor(0,255,255),QColor(255,0,255)};
 
     m_customPlot->addGraph();
-    m_customPlot->graph(0)->setName(QString("ARR"));
+    m_customPlot->graph(0)->setName(QString("nars"));
     m_customPlot->graph(0)->setLineStyle((QCPGraph::LineStyle)(1));
     m_customPlot->graph(0)->addToLegend();
-    m_customPlot->graph(0)->setData(xv,yv);
+    m_customPlot->graph(0)->setData(t,nars);
     QPen graphPen;
     graphPen.setColor(colors[0]);
     graphPen.setWidthF(1.5);
     m_customPlot->graph(0)->setPen(graphPen);
 
-
-    m_customPlot->addGraph();
-    m_customPlot->graph(1)->setName(QString("ARR_coms"));
+    /*m_customPlot->addGraph();
+    m_customPlot->graph(1)->setName(QString("ne"));
     m_customPlot->graph(1)->setLineStyle((QCPGraph::LineStyle)(1));
     m_customPlot->graph(1)->addToLegend();
-    m_customPlot->graph(1)->setData(xf,yf);
+    m_customPlot->graph(1)->setData(t,ne);
 
     graphPen.setColor(colors[2]);
     graphPen.setWidthF(1.5);
-    m_customPlot->graph(1)->setPen(graphPen);
+    m_customPlot->graph(1)->setPen(graphPen);*/
 
-    for (int i=0; i < xv.size(); ++i)
+
+    /*m_customPlot->addGraph();
+    m_customPlot->graph(2)->setName(QString("eps"));
+    m_customPlot->graph(2)->setLineStyle((QCPGraph::LineStyle)(1));
+    m_customPlot->graph(2)->addToLegend();
+    m_customPlot->graph(2)->setData(t,eps);
+
+    graphPen.setColor(colors[1]);
+    graphPen.setWidth(1.5);
+    m_customPlot->graph(2)->setPen(graphPen);*/
+
+    for (int i=0; i < nars.size(); ++i)
     {
-        if(yv[i] > m_maxY)
-            m_maxY = yv[i];
-        if(yv[i] < m_minY)
-            m_minY = yv[i];
+        if(nars[i] > m_maxY)
+            m_maxY = nars[i];
+        if(nars[i] < m_minY)
+            m_minY = nars[i];
 
-        if(xv[i] > m_maxX)
-            m_maxX = xv[i];
-        if(xv[i] < m_minX)
-            m_minX = xv[i];
-    }
-
-
-
-    for (int i=0; i < xf.size(); ++i)
-    {
-        if(yf[i] > m_maxY)
-            m_maxY = yf[i];
-        if(yf[i] < m_minY)
-            m_minY = yf[i];
-
-        if(xf[i] > m_maxX)
-            m_maxX = xf[i];
-        if(xf[i] < m_minX)
-            m_minX = xf[i];
+        if(t[i] > m_maxX)
+            m_maxX = t[i];
+        if(t[i] < m_minX)
+            m_minX = t[i];
     }
 
 

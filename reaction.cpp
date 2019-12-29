@@ -96,6 +96,16 @@ double *reaction::getR()
     return m_R;
 }
 
+double reaction::getRate(double eps)
+{
+    return m_spline->getSpline(eps);
+}
+
+double reaction::getDeriv(double eps)
+{
+    return m_spline->getPrime(eps);
+}
+
 reactionEAr_EAr_comsol::reactionEAr_EAr_comsol(simulationData *data):reaction(data)
 {
     if (data != nullptr)
@@ -219,6 +229,16 @@ void reactionArsArs_EArArp_comsol::calc()
     }
 }
 
+double reactionArsArs_EArArp_comsol::getRate(double eps)
+{
+    return m_k;
+}
+
+double reactionArsArs_EArArp_comsol::getDeriv(double eps)
+{
+    return 0.0;
+}
+
 reactionArsAr_ArAr_comsol::reactionArsAr_ArAr_comsol(simulationData *data):reaction(data)
 {
 
@@ -230,5 +250,15 @@ void reactionArsAr_ArAr_comsol::calc()
     {
        m_R[i] = m_k;
     }
+}
+
+double reactionArsAr_ArAr_comsol::getRate(double eps)
+{
+    return m_k;
+}
+
+double reactionArsAr_ArAr_comsol::getDeriv(double eps)
+{
+    return 0.0;
 }
 

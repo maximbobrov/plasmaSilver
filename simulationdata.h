@@ -93,6 +93,7 @@ public:
     simulationParameters *getParameters();
 
 private:
+    friend class reactionSolver;
     double m_dt;
     double m_dz;
     int m_defaultCellsNumber;
