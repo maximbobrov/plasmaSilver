@@ -115,7 +115,8 @@ reactionEAr_EAr_comsol::reactionEAr_EAr_comsol(simulationData *data):reaction(da
 
         m_spline=new splineInterp(20);
 
-        m_spline->fillData(comsol_EAr_EAr,comsol_EAr_EAr_num);
+        double Na=6.022e23;
+        m_spline->fillData(comsol_EAr_EAr,comsol_EAr_EAr_num,Na);
 
     }
 }
@@ -139,7 +140,8 @@ reactionEAr_EArs_comsol::reactionEAr_EArs_comsol(simulationData *data):reaction(
     {
         m_spline=new splineInterp(20);
 
-        m_spline->fillData(comsol_EAr_EArs,comsol_EAr_EArs_num);
+         double Na=6.022e23;
+        m_spline->fillData(comsol_EAr_EArs,comsol_EAr_EArs_num,Na);
         //m_cs->fillSigmas2(g_EArs_2EArp,g_EArs_2EArp_num);
     }
 }
@@ -162,7 +164,8 @@ reactionEArs_EAr_comsol::reactionEArs_EAr_comsol(simulationData *data):reaction(
     {
         m_spline=new splineInterp(20);
 
-        m_spline->fillData(comsol_EArs_EAr,comsol_EArs_EAr_num);
+         double Na=6.022e23;
+        m_spline->fillData(comsol_EArs_EAr,comsol_EArs_EAr_num,Na);
         //m_cs->fillSigmas2(g_EArs_2EArp,g_EArs_2EArp_num);
     }
 }
@@ -187,7 +190,8 @@ reactionEArs_2EArp_comsol::reactionEArs_2EArp_comsol(simulationData *data):react
     {
         m_spline=new splineInterp(20);
 
-        m_spline->fillData(comsol_EArs_2EArp,comsol_EArs_2EArp_num);
+         double Na=6.022e23;
+        m_spline->fillData(comsol_EArs_2EArp,comsol_EArs_2EArp_num,Na);
         //m_cs->fillSigmas2(g_EArs_2EArp,g_EArs_2EArp_num);
     }
 }
@@ -205,7 +209,8 @@ reactionEAr_2EArp_comsol::reactionEAr_2EArp_comsol(simulationData *data):reactio
     {
         m_spline=new splineInterp(20);
 
-        m_spline->fillData(comsol_EAr_2EArp,comsol_EAr_2EArp_num);
+         double Na=6.022e23;
+        m_spline->fillData(comsol_EAr_2EArp,comsol_EAr_2EArp_num,Na);
         //m_cs->fillSigmas2(g_EArs_2EArp,g_EArs_2EArp_num);
     }
 }
@@ -231,7 +236,7 @@ void reactionArsArs_EArArp_comsol::calc()
 
 double reactionArsArs_EArArp_comsol::getRate(double eps)
 {
-    return m_k;
+    return m_k/6.022e23;
 }
 
 double reactionArsArs_EArArp_comsol::getDeriv(double eps)
@@ -254,7 +259,7 @@ void reactionArsAr_ArAr_comsol::calc()
 
 double reactionArsAr_ArAr_comsol::getRate(double eps)
 {
-    return m_k;
+    return m_k/6.022e23;
 }
 
 double reactionArsAr_ArAr_comsol::getDeriv(double eps)

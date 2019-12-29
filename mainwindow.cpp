@@ -335,7 +335,7 @@ void MainWindow::drawDebug(bool)
         m_customPlot->graph(i)->setName(QString("num = ").number(i));
         m_customPlot->graph(i)->setLineStyle((QCPGraph::LineStyle)(1));
         m_customPlot->graph(i)->addToLegend();
-        m_customPlot->graph(i)->setData(ee,dd[i]);
+        m_customPlot->graph(i)->setData(ee,rr[i]);
         QPen graphPen;
         graphPen.setColor(colors[i]);
         graphPen.setWidthF(1.5);
@@ -365,11 +365,11 @@ void MainWindow::drawDebug(bool)
     solver->rhs_nars=0.0;
     solver->rhs_ne=0.0;
 
-    solver->ne_i=1e13;
+    solver->ne_i=1e5;
     solver->nars_i=1e5;
-    solver->n_n=1e15;
-    solver->eps_i=6.0;
-    solver->dt=1e-17;
+    solver->n_n=1e12;
+    solver->eps_i=16.0;
+    solver->dt=5e2;
 
 
     QVector<double> ne,nars,eps,t;
@@ -378,10 +378,17 @@ void MainWindow::drawDebug(bool)
     //nars.push_back(solver->nars_i);
     //eps.push_back(solver->eps_i);
     t.push_back(0.0);
-    for (int i=0;i<100;i++)
+    for (int i=0;i<1000;i++)
     {
 
-        solver->solve(5);
+         solver->dt=5e-1*(i+1)*(i+1);
+        for (int j=0;j<100;j++)
+       { solver->solve(1);
+            solver->ne_i=solver->ne_o;
+            solver->nars_i=solver->nars_o;
+            solver->eps_i=solver->eps_o;
+
+        }
 
 
         ne.push_back(solver->ne_o);
@@ -389,26 +396,22 @@ void MainWindow::drawDebug(bool)
         eps.push_back(solver->eps_o);
         t.push_back(solver->dt*i);
 
-        solver->ne_i=solver->ne_o;
-        solver->nars_i=solver->nars_o;
-        solver->eps_i=solver->eps_o;
 
        /* if (solver->ne_i<1e5) solver->ne_i=1e5;
         if (solver->eps_i<0.01) solver->eps_i=0.01;
         if (solver->eps_i>40.0) solver->eps_i=40.0;
 
         if (solver->nars_i<1e5) solver->nars_i=1e5;*/
-
     }
 
 
 
-    double m_maxY=-1e30;
-    double m_minY=+1e30;
+    double m_maxY=-1e50;
+    double m_minY=+1e50;
 
 
-    double m_maxX=-1e30;
-    double m_minX=+1e30;
+    double m_maxX=-1e50;
+    double m_minX=+1e50;
 
     m_customPlot->clearGraphs();
     m_customPlot->xAxis->setLabel("x");
@@ -446,7 +449,7 @@ void MainWindow::drawDebug(bool)
     graphPen.setWidth(1.5);
     m_customPlot->graph(2)->setPen(graphPen);*/
 
-    for (int i=0; i < nars.size(); ++i)
+    for (int i=0; i < nars.size()-1; ++i)
     {
         if(nars[i] > m_maxY)
             m_maxY = nars[i];
@@ -459,7 +462,7 @@ void MainWindow::drawDebug(bool)
             m_minX = t[i];
     }
 
-
+  qDebug()<<"min="<<m_minY<<" max="<<m_maxY;
 
     m_customPlot->xAxis->setRange(m_minX,m_maxX);
     m_customPlot->yAxis->setRange(m_minY, m_maxY);

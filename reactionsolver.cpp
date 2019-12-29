@@ -20,7 +20,7 @@ void reactionSolver::solve(int itn)
     double dk[7];
     double A[7]; //energy gain/loss of reaction
 
-    //for (int nn=0;nn<itn;nn++)
+    for (int nn=0;nn<itn;nn++)
     {
         for (int i=0;i<7;i++)
         {
@@ -81,26 +81,50 @@ void reactionSolver::solve(int itn)
         oValues[2]-=dValues[2];*/
 
 
-        f[2]=-(oValues[2]-nars_i)/dt+rhs_nars + oValues[0]*(k[1]*n_n -(k[2]+k[4])*oValues[2])
+
+        double a,b,c,D;//ax^2+bx+c=0
+
+     //        0=   -oValues[2]/dt+nars_i/dt+rhs_nars + oValues[0]*k[1]*n_n -oValues[0]*(k[2]+k[4])*oValues[2])
+    //                    -2.0*k[5]*oValues[2]*oValues[2]-k[6]*n_n*oValues[2];
+
+    //            0=   oValues[2]*(-1/dt-oValues[0]*(k[2]+k[4]) -k[6]*n_n)+nars_i/dt+rhs_nars + oValues[0]*k[1]*n_n
+    //                                   -2.0*k[5]*oValues[2]*oValues[2];
+
+
+       // oValues[2]*(1/dt+oValues[0]*(k[2]+k[4]) +k[6]*n_n+2.0*k[5]*nars_i)=   nars_i/dt+rhs_nars oValues[0]*k[1]*n_n;
+
+        oValues[2]=   (nars_i/dt+rhs_nars + oValues[0]*k[1]*n_n)/(1/dt+oValues[0]*(k[2]+k[4]) +k[6]*n_n+2.0*k[5]*nars_i);
+
+   /* a=-2.0*k[5];
+    b=-1/dt-oValues[0]*(k[2]+k[4]) -k[6]*n_n;
+    c=nars_i/dt+ oValues[0]*k[1]*n_n;
+
+    D=b*b-4*a*c;
+
+    oValues[2]=(-b-sqrt(D))/(2*a);
+
+    qDebug()<<"D="<<D<<" X0="<<(-b+sqrt(D))/(2*a)<<" X1="<<(-b-sqrt(D))/(2*a);*/
+
+   /*     f[2]=-(oValues[2]-nars_i)/dt+rhs_nars + oValues[0]*(k[1]*n_n -(k[2]+k[4])*oValues[2])
                 -2.0*k[5]*oValues[2]*oValues[2]-k[6]*n_n*oValues[2];
 
 
         df[2][2]=-(1)/dt+ oValues[0]*( -(k[2]+k[4]))
                 -4.0*k[5]*oValues[2]-k[6]*n_n;
 
-        //solve3x3(df,f,dValues);
+        solve3x3(df,f,dValues);*/
 
         //oValues[0]-=dValues[0];
         //oValues[1]-=dValues[1];
         //oValues[2]-=f[2]/df[2][2];
 
-        oValues[2]=nars_i+dt*(rhs_nars + oValues[0]*(k[1]*n_n) -(k[2]+k[4])*oValues[2]
-               /* -2.0*k[5]*oValues[2]*oValues[2]-k[6]*n_n*oValues[2]*/);
+//        oValues[2]=nars_i+dt*(rhs_nars + oValues[0]*(k[1]*n_n) -(k[2]+k[4])*oValues[2]
+  //              -2.0*k[5]*oValues[2]*oValues[2]-k[6]*n_n*oValues[2]);
     }
 
 
-    ne_o=oValues[0];
-    eps_o=oValues[1];
+  //  ne_o=oValues[0];
+  //  eps_o=oValues[1];
     nars_o=oValues[2];
 
 }
