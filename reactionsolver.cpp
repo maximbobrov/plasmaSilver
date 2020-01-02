@@ -18,27 +18,118 @@ void reactionSolver::solve(int itn)
     oValues[2]=nars_i;
     double k[7];
     double dk[7];
-    double A[7]; //energy gain/loss of reaction
+    double dE[7]; //energy gain/loss of reaction
+
+    double x0=ne_i;
+    double y0=nars_i;
+
+    double A,D,C,B,E,F;
+
+    for (int i=0;i<7;i++)
+    {
+        dE[i]=m_reactions[i]->getDe();
+    }
+
+
+    double dt_cur=dt;
+    double x,y,eps;
+    x=1.0;y=1.0;
+
+    eps=eps_i;
+   //  qDebug()<<"x0="<<x0<<" y0="<<y0<<" dt="<<dt<<" eps="<<eps_i<<" nn="<<n_n;
 
     for (int nn=0;nn<itn;nn++)
     {
         for (int i=0;i<7;i++)
         {
-            /*oValues[0]=ne_i;
-            oValues[1]=eps_i;
-            oValues[2]=nars_i;*/
-
-           /* if (oValues[0]<1e5) oValues[0]=1e5;
-            if (oValues[1]<0.01) oValues[1]=0.01;
-            if (oValues[1]>40.0) oValues[1]=40.0;
-
-            if (oValues[2]<1e5) oValues[2]=1e5;*/
-
-
-            k[i]=m_reactions[i]->getRate(oValues[1]);
-            dk[i]=m_reactions[i]->getDeriv(oValues[1]);
-            A[i]=m_reactions[i]->getDe();
+            k[i]=m_reactions[i]->getRate(eps*2.0/3.0);
+            dk[i]=m_reactions[i]->getDeriv(eps*2.0/3.0);
         }
+        /*        //n_e
+                (oValues[0] - ne_i) / dt = oValues[0]*(k[3]*n_n + k[4]*oValues[2]) + k[5]*oValues[2]*nars_i;
+                //n_ars
+                 (oValues[2]-nars_i)/dt=oValues[0]*(k[1]*n_n -(k[2]+k[4])*oValues[2]) -2.0*k[5]*oValues[2]*nars_i;
+
+        a=dt*k[3]*n_n;   b=dt*k[1]*n_n; c=dt*nars_i*k[5];
+        d=dt*k[4];  e=dt*(k[2]+k[4]);
+
+        //ne
+        x - ne_i = x*(a + d*y) + c*y;
+        //n_ars
+         y-nars_i=x*(b -e*y) -2.0*c*y;
+                */
+
+        A=(dt_cur*k[3]*n_n-1.0);
+        D=dt_cur*k[4]*y0;
+        C=dt_cur*k[5]*y0*(y0/x0);
+        //Ax+Dxy+Cy+1=0  ne eqn;  x is x/x0 y is y/y0
+
+        B=dt_cur*k[1]*n_n*(x0/y0);
+        E=-dt_cur*(k[2]+k[4])*x0;
+        F=-1.0-2.0*dt_cur*k[5]*y0;
+        //Bx+Exy+Fy+1=0  nars eqn;  x is x/x0 y is y/y0
+
+
+       // qDebug()<<"nn="<<nn<<" A="<<A<<" D="<<D<<" C="<<C;
+       // qDebug()<<"B="<<B<<" E="<<E<<" F="<<F;
+
+
+
+        double f_ne,f_nars, dfx_ne,dfy_ne, dfx_nars,dfy_nars;
+
+        f_ne=A*x+D*x*y+C*y+1;
+        dfx_ne=A+D*y;
+        dfy_ne=C+D*x;
+
+        f_nars=B*x+E*x*y+F*y+1;
+        dfx_nars=B+E*y;
+        dfy_nars=F+E*x;
+
+        double det = dfx_ne*dfy_nars - dfy_ne*dfx_nars;
+
+        double d_x = -f_ne*dfy_nars + f_nars*dfy_ne;
+        double d_y = f_ne*dfx_nars - f_nars*dfx_ne;
+
+        x+=d_x;
+        y+=d_y;
+
+      //  qDebug()<<"f_ne"<<f_ne<<" f_nars="<<f_nars<<" x="<<x<<" y="<<y;
+
+
+//now lets get Te
+
+/*        (eps - eps_i) / dt=
+                        n_n * ( dE[1]*k[1] + ( dE[3] - eps ) *k[3]) +
+                        y*y0 * ( dE[2]*k[2] + ( dE[4] - eps )*k[4] ) +
+                        ( ( dE[5] - eps ) * k[5] * y*y0 * nars_i ) / (x*x0);
+*/
+
+        double eA,eB,eC,eD,eF, eG;
+
+
+/*
+          eps = eps_i +
+                        dt*n_n * dE[1]*k[1] + dt*n_n*k3*dE[3] - dt*n_n*k3*eps  +
+                        dt*y*y0 *dE[2]*k[2] + dt*y*y0 *k[4]*dE[4] - dt*y*y0 *k[4]*eps   +
+                       (dt/ (x*x0))* k[5] * y*y0 * nars_i*dE[5] - (dt/ (x*x0))* k[5] * y*y0 * nars_i*eps  ;
+ */
+
+        eps  = (eps_i +
+                      dt*n_n * dE[1]*k[1] + dt*n_n*k[3]*dE[3] +
+                      dt*y*y0 *dE[2]*k[2] + dt*y*y0 *k[4]*dE[4]    +
+                     (dt/ (x*x0))* k[5] * y*y0 * nars_i*dE[5])/(1.0  + dt*(n_n*k[3] + y*y0 *k[4] +  ( k[5] * y*y0 * nars_i/ (x*x0)) )) ;
+
+
+    }
+
+
+    ne_o=x*x0;//oValues[0];
+    eps_o=eps;//oValues[1];
+    nars_o=y*y0;//oValues[2];
+
+}
+
+
         //ne:
         /*f[0]=-(oValues[0]-ne_i)/dt+rhs_ne + oValues[0]*(k[3]*n_n +k[4]*oValues[2])+k[5]*oValues[2]*oValues[2];
 
@@ -82,8 +173,6 @@ void reactionSolver::solve(int itn)
 
 
 
-        double a,b,c,D;//ax^2+bx+c=0
-
      //        0=   -oValues[2]/dt+nars_i/dt+rhs_nars + oValues[0]*k[1]*n_n -oValues[0]*(k[2]+k[4])*oValues[2])
     //                    -2.0*k[5]*oValues[2]*oValues[2]-k[6]*n_n*oValues[2];
 
@@ -93,7 +182,124 @@ void reactionSolver::solve(int itn)
 
        // oValues[2]*(1/dt+oValues[0]*(k[2]+k[4]) +k[6]*n_n+2.0*k[5]*nars_i)=   nars_i/dt+rhs_nars oValues[0]*k[1]*n_n;
 
-        oValues[2]=   (nars_i/dt+rhs_nars + oValues[0]*k[1]*n_n)/(1/dt+oValues[0]*(k[2]+k[4]) +k[6]*n_n+2.0*k[5]*nars_i);
+       // oValues[2]=   (nars_i/dt+rhs_nars + oValues[0]*k[1]*n_n)/(1/dt+oValues[0]*(k[2]+k[4]) +k[6]*n_n+2.0*k[5]*nars_i);
+
+
+/*
+        m_reactions.push_back(new reactionEAr_EAr_comsol(this));
+        m_reactions.push_back(new reactionEAr_EArs_comsol(this));
+        m_reactions.push_back(new reactionEArs_EAr_comsol(this));
+        m_reactions.push_back(new reactionEAr_2EArp_comsol(this));
+        m_reactions.push_back(new reactionEArs_2EArp_comsol(this));
+        m_reactions.push_back(new reactionArsArs_EArArp_comsol(this));
+        m_reactions.push_back(new reactionArsAr_ArAr_comsol(this));
+*/
+
+            // 0=-(oValues[2]-nars_i)/dt+oValues[0]*(k[1]*n_n -(k[2]+k[4])*oValues[2]);
+
+        //oValues[2]=nars_i+dt*oValues[0]*(k[1]*n_n /*-(k[2]+k[4])*oValues[2]*/); //tested good for k[1]
+
+        //oValues[2]=nars_i/(1.0 + dt*(k[2]*oValues[0]));  //tested good for k[2]
+
+        //oValues[2]=nars_i/(1.0 + dt*(k[4]*oValues[0]));  //test good for k[4]
+
+        //0=(oValues[2]-nars_i)/dt + 2.0*k[5]*oValues[2]*oValues[2] +k[6]*n_n*oValues[2];
+
+        //nars_i/dt=oValues[2]/dt + 2.0*k[5]*oValues[2]*oValues[2] ;
+        //oValues[2]=nars_i/(1.0 + dt*2.0*k[5]*nars_i); //tested good for k[5]
+        //oValues[2]=nars_i/(1.0 + dt*k[6]*n_n); //tested good for k[6]
+
+
+        //we will neglect k[6] and k[0] lets build a simple system:
+        //////////derivation start:
+/*        //n_e
+        (oValues[0] - ne_i) / dt = oValues[0]*(k[3]*n_n + k[4]*oValues[2]) + k[5]*oValues[2]*nars_i;
+        //n_ars
+         (oValues[2]-nars_i)/dt=oValues[0]*(k[1]*n_n -(k[2]+k[4])*oValues[2]) -2.0*k[5]*oValues[2]*nars_i;
+        */
+
+    /*    x=oValues[0];  y=oValues[2];
+        a=dt*k[3]*n_n;   b=dt*k[1]*n_n; c=dt*nars_i*k[5];
+        d=dt*k[4];  e=dt*(k[2]+k[4]);
+
+        //ne
+        x - ne_i = x*(a + d*y) + c*y;
+        //n_ars
+         y-nars_i=x*(b -e*y) -2.0*c*y;
+
+         ne_i=x0;
+         nars_i=y0;
+
+         //ne
+         x*e*(a-1) + e*c*y + d*e*x*y +e*x0=0
+         //nars
+         d*b*x - e*d*x*y -d*y*(1+2*c) +d*y0 =0
+
+
+         //sum
+               x*e*(a-1) + e*c*y + e*x0 + d*b*x -d*y*(1+2*c) +d*y0 =0
+                 x*(e*(a-1)+d*b) + y*(e*c - d*(1+2*c)) + e*x0 +d*y0 =0
+
+                 A=(e*(a-1)+d*b);
+                B=(e*c - d*(1+2*c));
+                C= e*x0 +d*y0;
+                A*x+B*y+C=0.0;
+
+                x= -C/A-B/A*y;
+                -C/A=D;
+                -B/A=E;
+                x=D-E*y;
+
+                //substitute
+                d*b*(D-E*y) - e*d*(D-E*y)*y -d*y*(1+2*c) +d*y0 =0*/
+
+
+
+/*        //n_ars
+         oValues[0]=((oValues[2]-nars_i)/dt + 2.0*k[5]*oValues[2]*nars_i)/(k[1]*n_n -(k[2]+k[4])*oValues[2]);
+         oValues[0]=(1.0/dt)*(oValues[2]*(1.0 + dt*2.0*k[5]*nars_i)  -nars_i)/(k[1]*n_n -(k[2]+k[4])*oValues[2]);
+        //n_e
+        oValues[0]  =(1.0/dt)*(ne_i + dt*k[5]*oValues[2]*nars_i)/( 1.0/dt -(k[3]*n_n + k[4]*oValues[2]));
+         //combin:
+
+
+        (oValues[2]*(1.0 + dt*2.0*k[5]*nars_i)  -nars_i)/(k[1]*n_n -(k[2]+k[4])*oValues[2]) =
+         (ne_i + dt*k[5]*oValues[2]*nars_i)/( 1.0/dt -(k[3]*n_n + k[4]*oValues[2]));
+
+
+        ( 1.0/dt -k[3]*n_n + k[4]*oValues[2])*(oValues[2]*(1.0 + dt*2.0*k[5]*nars_i)  -nars_i) =
+         (ne_i + dt*k[5]*oValues[2]*nars_i)*(k[1]*n_n -(k[2]+k[4])*oValues[2]);
+
+
+        oValues[2]=x;
+        1.0/dt -k[3]*n_n = a;
+        1.0 + dt*2.0*k[5]*nars_i =b;
+        dt*k[5]*nars_i=c;
+        (k[2]+k[4])=d;
+        k[4]=e;
+        nars_i=f;
+        ne_i=g;
+        k[1]*n_n=h;
+
+        (a + e*x)*(x*b - f) = (g + c*x)*(h - d*x);
+
+        a*b*x -a*f + e*b*x*x -e*f*x = (g*h-d*g*x + c*h*x- c*d*x*x);       */
+
+
+
+/*
+               //eps
+        (oValues[1] - eps_i) / dt=
+                        n_n * ( A[1]*k[1] + ( A[3] - oValues[1] ) * k[3]) +
+                        oValues[2] * ( A[2]*k[2] + ( A[4] - oValues[1] )*k[4] ) +
+                        ( ( A[5] - oValues[1] ) * k[5] * oValues[2] * nars_i ) / oValues[0];
+*/
+
+        ////////////derivation end
+
+
+
+         //oValues[2]=   (nars_i/dt+oValues[0]*k[1]*n_n)/(1/dt);
 
    /* a=-2.0*k[5];
     b=-1/dt-oValues[0]*(k[2]+k[4]) -k[6]*n_n;
@@ -120,11 +326,3 @@ void reactionSolver::solve(int itn)
 
 //        oValues[2]=nars_i+dt*(rhs_nars + oValues[0]*(k[1]*n_n) -(k[2]+k[4])*oValues[2]
   //              -2.0*k[5]*oValues[2]*oValues[2]-k[6]*n_n*oValues[2]);
-    }
-
-
-  //  ne_o=oValues[0];
-  //  eps_o=oValues[1];
-    nars_o=oValues[2];
-
-}

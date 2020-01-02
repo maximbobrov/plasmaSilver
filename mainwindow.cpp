@@ -365,11 +365,11 @@ void MainWindow::drawDebug(bool)
     solver->rhs_nars=0.0;
     solver->rhs_ne=0.0;
 
-    solver->ne_i=1e5;
-    solver->nars_i=1e5;
-    solver->n_n=1e12;
-    solver->eps_i=16.0;
-    solver->dt=5e2;
+    solver->ne_i=1e13;
+    solver->nars_i=3.5372e13;//3.2983e13;
+    solver->n_n=3.5372e21;
+    solver->eps_i=5.0;//3.3333;
+    solver->dt=1e-9;
 
 
     QVector<double> ne,nars,eps,t;
@@ -378,12 +378,15 @@ void MainWindow::drawDebug(bool)
     //nars.push_back(solver->nars_i);
     //eps.push_back(solver->eps_i);
     t.push_back(0.0);
-    for (int i=0;i<1000;i++)
+    double t_cur=0.0;
+    for (int i=0;i<300;i++)
     {
 
-         solver->dt=5e-1*(i+1)*(i+1);
-        for (int j=0;j<100;j++)
-       { solver->solve(1);
+         solver->dt=1e-9*pow((i+1),0.71);
+         t_cur+=solver->dt;
+         qDebug()<<"t="<<t_cur <<" eps="<<solver->eps_o<<" ne="<<solver->ne_o<<" ars="<<solver->nars_o;
+       // for (int j=0;j<100;j++)
+       { solver->solve(4);
             solver->ne_i=solver->ne_o;
             solver->nars_i=solver->nars_o;
             solver->eps_i=solver->eps_o;
@@ -391,10 +394,10 @@ void MainWindow::drawDebug(bool)
         }
 
 
-        ne.push_back(solver->ne_o);
-        nars.push_back(solver->nars_o);
-        eps.push_back(solver->eps_o);
-        t.push_back(solver->dt*i);
+        ne.push_back(solver->ne_o/1e13);
+        nars.push_back(solver->nars_o/3.5372e13);
+        eps.push_back(solver->eps_o/5.0);
+        t.push_back(t_cur);
 
 
        /* if (solver->ne_i<1e5) solver->ne_i=1e5;
@@ -428,7 +431,7 @@ void MainWindow::drawDebug(bool)
     graphPen.setWidthF(1.5);
     m_customPlot->graph(0)->setPen(graphPen);
 
-    /*m_customPlot->addGraph();
+    m_customPlot->addGraph();
     m_customPlot->graph(1)->setName(QString("ne"));
     m_customPlot->graph(1)->setLineStyle((QCPGraph::LineStyle)(1));
     m_customPlot->graph(1)->addToLegend();
@@ -436,10 +439,10 @@ void MainWindow::drawDebug(bool)
 
     graphPen.setColor(colors[2]);
     graphPen.setWidthF(1.5);
-    m_customPlot->graph(1)->setPen(graphPen);*/
+    m_customPlot->graph(1)->setPen(graphPen);
 
 
-    /*m_customPlot->addGraph();
+    m_customPlot->addGraph();
     m_customPlot->graph(2)->setName(QString("eps"));
     m_customPlot->graph(2)->setLineStyle((QCPGraph::LineStyle)(1));
     m_customPlot->graph(2)->addToLegend();
@@ -447,7 +450,7 @@ void MainWindow::drawDebug(bool)
 
     graphPen.setColor(colors[1]);
     graphPen.setWidth(1.5);
-    m_customPlot->graph(2)->setPen(graphPen);*/
+    m_customPlot->graph(2)->setPen(graphPen);
 
     for (int i=0; i < nars.size()-1; ++i)
     {
@@ -465,7 +468,7 @@ void MainWindow::drawDebug(bool)
   qDebug()<<"min="<<m_minY<<" max="<<m_maxY;
 
     m_customPlot->xAxis->setRange(m_minX,m_maxX);
-    m_customPlot->yAxis->setRange(m_minY, m_maxY);
+    m_customPlot->yAxis->setRange(1,1.06);//m_minY, m_maxY);
     m_customPlot->legend->setVisible(true);
     m_customPlot->replot();
 }
