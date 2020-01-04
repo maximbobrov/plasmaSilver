@@ -16,6 +16,7 @@
 #include "simulationsolver.h"
 #include "simulationtools.h"
 
+class reactionSolver;
 
 class MainWindow : public QMainWindow
 {
@@ -42,8 +43,11 @@ public:
 public slots:
     void initData();
     void updateData();
+    void solveNewton();
     void simulateData(bool);
     void drawDebug(bool);
+    void singleStep(bool);
+    void singleAdvect(bool);
     void replotGraph(int);
 private:
     QWidget* m_widget;
@@ -58,6 +62,8 @@ private:
     QVector<QCheckBox*> m_checkBoxes;
     QPushButton* m_simulateButton;
     QPushButton* m_debugButton;
+    QPushButton* m_stepButton;
+    QPushButton* m_advectButton;
     simulationData* m_data;
     solverNe* m_sNe;
     solverEnergy* m_sEn;
@@ -68,7 +74,7 @@ private:
     simulationData::simulationField* m_fEnergy;
     simulationData::simulationField* m_fPhi;
     QVector<simulationData::simulationField*> m_fHeavy;
-
+    reactionSolver * m_rSolver;
     QVector<plotStruct> m_plots;
     QVector<storeStruct> m_storage;
     double m_maxY, m_minY;

@@ -17,13 +17,19 @@ public:
    // std::vector<simulationData::simulationField* > m_iFields;
     std::vector<reaction* > m_reactions;
 
-    double dt;
+    double dt,dz; //time and length steps
 
-    double n_n,ne_i,eps_i,nars_i;
-    double ne_o,eps_o,nars_o;
+    double n_n,ne_i,nars_i; //initial values
+    double ne_o,eps_o,neps_o,nars_o,narp_o; //output values
+    double ne_0,nars_0; //values from previous timestep
 
-    double rhs_ne,rhs_eps,rhs_nars;
-   void solve(int itn); //fully implicit
+
+    double rhs_ne,rhs_neps,rhs_nars,rhs_narp; //right hand side
+    double nu_ne,nu_neps,nu_nars,nu_narp; //viscosities
+
+
+   void solve(int itn); //fully implicit no diffusuion
+   void solve_diffuse(int itn); //fully implicit with diffusuion
 
 private:
 

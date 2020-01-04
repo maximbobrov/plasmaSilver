@@ -192,7 +192,7 @@ void simulationData::updateParams()
 
         pParams->arrDe[j] = pParams->arrMue[j] * pParams->arrTe[j];
         pParams->arrDeps[j] = pParams->arrMueps[j] * pParams->arrTe[j];
-        pParams->arrE[j] = - simulationTools::ddzCentral(pPhi->arr, pPhi->cellsNumber, dz, j);
+        pParams->arrE[j] = - 10*simulationTools::ddzCentral(pPhi->arr, pPhi->cellsNumber, dz, j);
         pParams->arrDomega[j] = 0.01;// m^2/s
         pParams->arrMuomega[j]=pParams->arrDomega[j]*q/(k_B_const*pParams->T);
     }

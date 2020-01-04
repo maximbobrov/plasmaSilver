@@ -12,8 +12,13 @@ public:
 
     virtual double solve(int numberIteration);
     virtual double getRhs();
+     virtual double getRhsAt(int j);
     virtual void getStepEuler();
     virtual void setBc();
+
+    virtual double getNewtonRhs(int i);
+    virtual double getNewtonRhsFirst();
+    virtual double getNewtonRhsLast();
 
     virtual ~simulationSolver();
 
@@ -21,6 +26,7 @@ protected:
     simulationData* m_pData;
     simulationData::simulationField* m_field;
     double* m_aRHS;
+    double* m_NewtonRHS;
     double* m_aNu;
 };
 
@@ -29,6 +35,7 @@ class solverNe : public simulationSolver
 public:
     solverNe(simulationData* pData = nullptr);
     virtual double getRhs();
+    virtual double getRhsAt(int j);
     virtual void setBc();
     virtual ~solverNe();
 };
@@ -39,6 +46,7 @@ class solverEnergy : public simulationSolver
 public:
     solverEnergy(simulationData* pData = nullptr);
     virtual double getRhs();
+    virtual double getRhsAt(int j);
     virtual void setBc();
     virtual ~solverEnergy();
 };
@@ -58,7 +66,7 @@ class solverHeavySpicies : public simulationSolver
 public:
     solverHeavySpicies(simulationData* pData = nullptr, int num = 0);
     virtual double getRhs();
-
+    virtual double getRhsAt(int j);
     virtual void setBc();
     virtual ~solverHeavySpicies();
 private:
