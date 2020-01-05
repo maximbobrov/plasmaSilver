@@ -29,7 +29,7 @@ public:
 
 
    void solve(int itn); //fully implicit no diffusuion
-   void solve_diffuse(int itn); //fully implicit with diffusuion
+   bool solve_diffuse(int itn); //fully implicit with diffusuion
 
 private:
 

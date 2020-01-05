@@ -43,7 +43,7 @@ public:
 public slots:
     void initData();
     void updateData();
-    void solveNewton();
+    bool solveNewton();
     void simulateData(bool);
     void drawDebug(bool);
     void singleStep(bool);

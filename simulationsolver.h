@@ -17,8 +17,6 @@ public:
     virtual void setBc();
 
     virtual double getNewtonRhs(int i);
-    virtual double getNewtonRhsFirst();
-    virtual double getNewtonRhsLast();
 
     virtual ~simulationSolver();
 

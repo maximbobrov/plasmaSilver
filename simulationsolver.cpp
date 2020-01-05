@@ -77,6 +77,8 @@ void simulationSolver::setBc()
 double simulationSolver::getNewtonRhs(int j)
 {
 
+    if((j==1) || (j==m_field->cellsNumber - 2))
+        setBc();
     //x/dt_x - (x0/dt+nu*(xr+xl)/(dz*dz) + rhs) = x/dt_x -rhs_x
         double rhs=getRhsAt(j);
         double dz = m_pData->getDz();
@@ -84,39 +86,6 @@ double simulationSolver::getNewtonRhs(int j)
         return   (m_field->arrPrev[j])/dt + m_aNu[j]*(m_field->arr[j+1] + m_field->arr[j-1])/(dz*dz) + rhs;
        // return m_field->arrPrev[j]/dt;
 }
-
-double simulationSolver::getNewtonRhsFirst() //left bc here
-{
-    int j=1;
-
-    //zero gradient by default
-   // m_field->arr[j-1]=m_field->arr[j];
-    double rhs=getRhsAt(j);
-        double dz = m_pData->getDz();
-        double dt =m_pData->getDt();
-        return   (m_field->arrPrev[j])/dt + m_aNu[j]*(m_field->arr[j+1] + m_field->arr[j-1])/(dz*dz) + rhs;
-      // return m_field->arrPrev[j]/dt;
-   // for (int j=1; j < m_field->cellsNumber - 1; j++)
-         //x/dt_x - (x0/dt+nu*(xr+xl)/(dz*dz) + rhs) = x/dt_x -rhs_x
-}
-
-double simulationSolver::getNewtonRhsLast() //right bc here
-{
-    int j=m_field->cellsNumber - 2;
-
-    //m_field->arr[j+1]=m_field->arr[j];
-    double rhs=getRhsAt(j);
-        double dz = m_pData->getDz();
-        double dt =m_pData->getDt();
-        return   (m_field->arrPrev[j])/dt + m_aNu[j]*(m_field->arr[j+1] + m_field->arr[j-1])/(dz*dz) + rhs;
-
-       // return   (m_field->arrPrev[j])/dt;
-   // for (int j=1; j < m_field->cellsNumber - 1; j++)
-         //x/dt_x - (x0/dt+nu*(xr+xl)/(dz*dz) + rhs) = x/dt_x -rhs_x
-}
-
-
-
 
 solverNe::~solverNe()
 {
@@ -234,7 +203,7 @@ double solverEnergy::getRhsAt(int i)
    return     pParams->arrMueps[i] * pParams->arrE[i] * simulationTools::ddzCentral(m_field->arr, m_field ->cellsNumber, dz, i)
             + pParams->arrMueps[i] * m_field->arr[i] * simulationTools::ddzCentral(pParams->arrE, m_field ->cellsNumber, dz, i)
             + simulationTools::ddzCentral(m_field->arr , m_field ->cellsNumber, dz, i) * simulationTools::ddzCentral(pParams->arrDeps, m_field ->cellsNumber, dz, i)
-            - 0.001*electronFlux * pParams->arrE[i];
+            - 1.0*electronFlux * pParams->arrE[i];
 }
 
 void solverEnergy::setBc()
