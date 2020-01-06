@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <reactionsolver.h>
 
-#define NZ 200
+#define NZ 2300
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_textStartTime->setText(QString().number(0.0));
     m_textDeltaTime->setText(QString().number(m_data->getDt()));
-    m_textEndTime->setText(QString().number(1e-6));
+    m_textEndTime->setText(QString().number(1e-7));
 
 
     connect (m_simulateButton, SIGNAL(clicked(bool)), this, SLOT(simulateData(bool)));
@@ -272,20 +272,20 @@ void MainWindow::updateData()
 
    dt*= 1.05;
    m_data->setDt(dt);
-    /* for (int i = 0; i < 2; ++i)
+     for (int i = 0; i < 2; ++i)
     {
         m_data->updateParams();
         m_sNe->solve(5);
-        m_sEn->solve(5);
+       m_sEn->solve(5);
         for (int j = 0; j < m_numberHeavySpicies; ++j)
         {
             m_sHeavy[j]->solve(5);
         }
-        m_sPhi->solve(50);
+        m_sPhi->solve(5000);
 
     }
-*/
-    for (int i = 0; i < 10; ++i) {
+
+  /*  for (int i = 0; i < 10; ++i) {
         if(!solveNewton())
         {dt/=2.0;
         m_data->setDt(dt);}
