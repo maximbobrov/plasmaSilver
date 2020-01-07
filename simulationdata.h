@@ -4,6 +4,9 @@
 #include <vector>
 #include "reaction.h"
 
+
+#define NZ 2048
+
 class simulationData
 {
 public:

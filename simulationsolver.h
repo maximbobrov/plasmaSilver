@@ -26,6 +26,9 @@ protected:
     double* m_aRHS;
     double* m_NewtonRHS;
     double* m_aNu;
+     double* m_aMu;
+
+    int m_charge;
 };
 
 class solverNe : public simulationSolver
@@ -67,8 +70,7 @@ public:
     virtual double getRhsAt(int j);
     virtual void setBc();
     virtual ~solverHeavySpicies();
-private:
-    int m_charge;
+
     simulationData::SpecieName m_specie;
 };
 
