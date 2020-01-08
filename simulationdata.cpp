@@ -186,7 +186,9 @@ void simulationData::updateParams()
         pParams->arrMue[j] = 1e25 / m_params->N; ; //4e4; m^2/(V*s)
         pParams->arrMueps[j] =5.0 * pParams->arrMue[j] / 3.0;
 
-        pParams->arrTe[j]=(2.0/3.0)*fabs(pEn->arr[j])/(fabs(pNe->arr[j])+1e5);
+        pParams->arrTe[j]=/*3.0;//*/fmax(fmin((2.0/3.0)*(fabs(pEn->arr[j]))/(fabs(pNe->arr[j])+1e8),40),1.5);
+
+
         if (pParams->arrTe[j]>60.0) pParams->arrTe[j]=60.0; //some limiter here
 
 

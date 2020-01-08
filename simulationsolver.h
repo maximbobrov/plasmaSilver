@@ -19,6 +19,7 @@ public:
     virtual double getNewtonRhs(int i);
 
     virtual ~simulationSolver();
+    double calcE(int j);
 
 protected:
     simulationData* m_pData;

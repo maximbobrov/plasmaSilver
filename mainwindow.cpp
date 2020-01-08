@@ -125,7 +125,7 @@ void MainWindow::replotGraph(int number)
     }
     m_customPlot->xAxis->setRange(-1, 1);
     m_customPlot->yAxis->setRange(m_minY, m_maxY);
-    m_customPlot->legend->setVisible(true);
+    m_customPlot->legend->setVisible(false);
     m_customPlot->replot();
 }
 
@@ -214,7 +214,7 @@ void MainWindow::initData()
     for (int i = 0; i < NZ; ++i) {
 
         double x_=i*m_data->getDz();
-        m_fNe->arr[i] =5e11;//1e5+ 2.5e11*simulationTools::gauss(x_-0.15, 0.05);
+        m_fNe->arr[i] =1e13;//1e5+ 2.5e13*simulationTools::gauss(x_ -0.15, 0.025);
         m_fNe->arrPrev[i] =m_fNe->arr[i];
         m_fEnergy->arr[i] = 5.0*m_fNe->arr[i];
         m_fEnergy->arrPrev[i] = m_fEnergy->arr[i];
@@ -277,7 +277,7 @@ void MainWindow::updateData()
    // qDebug()<<"dt="<<dt;
  // m_data->setDt(1e+5);
 //m_sPhi->solve(100);
-   dt= 1.e-12;
+   dt= 1.e-11;
    m_data->setDt(dt);
  /*    for (int i = 0; i < 2; ++i)
     {
@@ -342,12 +342,12 @@ bool MainWindow::solveNewton()
     m_rSolver->nu_neps=m_data->getParameters()->arrDeps[1];;
     m_rSolver->nu_nars=m_data->getParameters()->arrDomega[1];;*/
 
-for (int nn=0;nn<40;nn++)
+for (int nn=0;nn<10;nn++)
 {
     m_sPhi->solve(1);
     m_data->updateParams();
 
-    for (int j=1; j <m_data->getFieldNe()->cellsNumber - 1; j++)
+    for (int j=1; j <NZ-1/*m_data->getFieldNe()->cellsNumber - 2*/; j++)
     {
       /*  if (j==1)
         {
@@ -382,15 +382,20 @@ for (int nn=0;nn<40;nn++)
         ne[j]=ne[j]*0.5+0.5*m_sNe->getNewtonRhs(j);
        // ars[j]=m_sNe->getNewtonRhs(j);
 
-        en[j]=en[j]*0.5+0.5*m_sEn->getNewtonRhs(j);
+       en[j]=en[j]*0.5+0.5*m_sEn->getNewtonRhs(j);
         ars[j]=ars[j]*0.5+0.5*m_sHeavy[simulationData::SpecieName::Ar_star]->getNewtonRhs(j);//*m_pParam-> arrMaskNe[i][j];;
         arp[j]=arp[j]*0.5+0.5*m_sHeavy[simulationData::SpecieName::Ar_plus]->getNewtonRhs(j);//*m_pParam-> arrMaskNe[i][j];;
 
 
     }
+    ne[0]=ne[1]-ne[2]+ne[1];
+    ne[NZ-1]=ne[NZ-2]-ne[NZ-3]+ne[NZ-2];
+
+    ne0[0]=ne0[1]-ne0[2]+ne0[1];
+    ne0[NZ-1]=ne0[NZ-2]-ne0[NZ-3]+ne0[NZ-2];
 }
 double netot=0.0;
-for (int j=1; j <m_data->getFieldNe()->cellsNumber - 1; j++)
+for (int j=0; j <NZ; j++)
 {
     netot+=ne[j];
 }
@@ -712,7 +717,7 @@ void MainWindow::drawDebug(bool)
 
     m_customPlot->xAxis->setRange(m_minX,m_maxX);
     m_customPlot->yAxis->setRange(0,1.06);//m_minY, m_maxY);
-    m_customPlot->legend->setVisible(true);
+    m_customPlot->legend->setVisible(false);
     m_customPlot->replot();
 }
 

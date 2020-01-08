@@ -20,6 +20,17 @@ simulationSolver::~simulationSolver()
 
 }
 
+double simulationSolver::calcE(int j)
+{
+    double * phi  = m_pData->getFieldPhi()->arr;
+    //   double * e  = m_pData->m_params->arrE;
+
+
+    //dt=1e-20;
+    double eu=phi[j+1] - phi[j];//phi[j+2] - phi[j+1];               //j+1
+    //double ed=phi[j] - phi[j-1];
+}
+
 double simulationSolver::solve(int iNumberIteration)
 {
     double res = 0.0;
@@ -105,15 +116,15 @@ double simulationSolver::getNewtonRhs(int j)
 */
 
     //dt=1e-20;
-    double eu=phi[j+2] - phi[j+1];               //j+1
-    double ed=phi[j] - phi[j-1];
+    double eu=/*calcE(j+1);*/phi[j+2] - phi[j+1];//phi[j+2] - phi[j+1];               //j+1
+    double ed=/*calcE(j-1);*/phi[j+1] - phi[j];
     double au= m_charge * eu *m_aMu[j] ;//(phi[j+1] - phi[j]) * m_aMu[j];
     double ad= m_charge * ed *m_aMu[j];//(phi[j] - phi[j-1]) * m_aMu[j];
 
-    double Ga_u = (j!=last)*(-m_aNu[j] /*+ (au>0)*au*/) / dz;
-    double Ga_d = (j!=1)*( m_aNu[j]  /*+ad<0)*ad*/) / dz;
-    double Gu = (j!=last)*(m_field->arr[j+1] * m_aNu[j]   +/*(au<0)*/m_field->arr[j+1] * au) / dz;
-    double Gd = (j!=1)*(-m_field->arr[j-1] * m_aNu[j]  +/*(ad>0)*/m_field->arr[j-1] * ad) / dz;
+    double Ga_u = (j<last)*(-m_aNu[j] /*+ (au>0)*au*/) / dz;
+    double Ga_d = (j>1)*( m_aNu[j] /*+0.5*au*/  /*+ad<0)*ad*/) / dz;
+    double Gu = (j<last)*(m_field->arr[j+1] * m_aNu[j]   +/*(au<0)*/2.0*(m_field->arrPrev[j+1]  )* au) / dz;
+    double Gd = (j>1)*(-m_field->arr[j-1] * m_aNu[j]  +/*(ad>0)*/2.0*(m_field->arrPrev[j]) * ad) / dz;
 
    //
 
@@ -262,10 +273,10 @@ double solverEnergy::getRhsAt(int i)
 
     double electronFlux =  - pParams->arrMue[i] * pParams->arrE[i] * pNe->arr[i] - pParams->arrDe[i]*simulationTools::ddzCentral(pNe->arr, m_field ->cellsNumber, dz, i);
 
-    return   //  pParams->arrMueps[i] * pParams->arrE[i] * simulationTools::ddzCentral(m_field->arr, m_field ->cellsNumber, dz, i)
+    return  0.0 // //  pParams->arrMueps[i] * pParams->arrE[i] * simulationTools::ddzCentral(m_field->arr, m_field ->cellsNumber, dz, i)
             // + pParams->arrMueps[i] * m_field->arr[i] * simulationTools::ddzCentral(pParams->arrE, m_field ->cellsNumber, dz, i);
             //+ simulationTools::ddzCentral(m_field->arr , m_field ->cellsNumber, dz, i) * simulationTools::ddzCentral(pParams->arrDeps, m_field ->cellsNumber, dz, i);
-            - 1.0*electronFlux * pParams->arrE[i];
+            + 1.0*electronFlux * pParams->arrE[i];
 }
 
 void solverEnergy::setBc()
@@ -326,7 +337,7 @@ double solverPhi::getRhs()
 
     for (int i = 1; i < m_field ->cellsNumber-1; ++i)
     {
-        m_aRHS[i] = q_over_eps0*0.5*((pNe[i]+pNe[i-1])-(pArp[i]+pArp[i+1]));//q_over_eps0*0.5*(-(pNe[i]+pNe[i+1])+(pArp[i]+pArp[i+1]));
+        m_aRHS[i] = -q_over_eps0*0.5*((pNe[i]+pNe[i-1])-(pArp[i]+pArp[i-1]));//q_over_eps0*0.5*(-(pNe[i]+pNe[i+1])+(pArp[i]+pArp[i+1]));
     }
     return 1;
 }
@@ -571,7 +582,7 @@ void solverPhi::setBc()
 {
     int last=m_field->cellsNumber - 1;
     m_field->arr[0] = 0;
-    m_field->arr[last]=100;
+    m_field->arr[NZ]=100;
 }
 
 
